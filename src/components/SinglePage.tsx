@@ -6,14 +6,12 @@ interface SinglePageProps {
   item: AlbumItemConfig;
   isLeft: boolean;
   pageNumber?: number;
-  loadImage?: boolean;
 }
 
 export const SinglePage: React.FC<SinglePageProps> = ({
   item,
   isLeft,
   pageNumber,
-  loadImage = true,
 }) => {
   const imageSrc = item.src || item.fallbackSrc || assets.page01;
 
@@ -24,7 +22,6 @@ export const SinglePage: React.FC<SinglePageProps> = ({
     >
       {/* Full Bleed Edge-to-Edge Photograph in 3:2 ratio */}
       <div className="absolute inset-0 overflow-hidden flex items-center justify-center">
-        {loadImage && (
         <img
           src={imageSrc}
           onError={(e) => {
@@ -39,7 +36,6 @@ export const SinglePage: React.FC<SinglePageProps> = ({
           decoding="async"
           draggable={false}
         />
-        )}
       </div>
 
       {/* Central Spine Curvature & Shadow */}

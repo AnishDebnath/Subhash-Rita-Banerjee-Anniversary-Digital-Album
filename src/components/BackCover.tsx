@@ -5,10 +5,9 @@ import { assets } from '@/assets';
 interface BackCoverProps {
   config: AlbumConfig;
   onRestart?: () => void;
-  loadImage?: boolean;
 }
 
-export const BackCover: React.FC<BackCoverProps> = ({ config, loadImage = true }) => {
+export const BackCover: React.FC<BackCoverProps> = ({ config }) => {
   const backItem = config.items.find(i => i.type === 'cover-back');
   const coverImage = backItem?.src || backItem?.fallbackSrc || assets.backCover;
 
@@ -61,7 +60,6 @@ export const BackCover: React.FC<BackCoverProps> = ({ config, loadImage = true }
 
         {/* Pure, Clean, Unfiltered Back Cover Image — No filters, no dark overlays, no text, 3:2 ratio */}
         <div className="absolute inset-0 z-0 flex items-center justify-center">
-          {loadImage && (
           <img 
             src={coverImage}
             onError={(e) => {
@@ -75,7 +73,6 @@ export const BackCover: React.FC<BackCoverProps> = ({ config, loadImage = true }
             loading="lazy"
             decoding="async"
           />
-          )}
         </div>
       </div>
 

@@ -487,10 +487,7 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
 
       {/* Hidden React-managed Template Container */}
       <div ref={templateRef} style={{ display: 'none' }} aria-hidden="true">
-        {leaves.map((leaf) => {
-          // Lazy content loading: only fetch images within ±3 leaves of the current page
-          const isNear = leaf.itemType === 'cover' || Math.abs(leaf.leafIndex - currentPage) <= 3;
-          return (
+        {leaves.map((leaf) => (
           <div
             key={leaf.id}
             className="album-page"
@@ -502,7 +499,7 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
             }}
           >
             {leaf.itemType === 'cover' && <Cover config={config} />}
-            {leaf.itemType === 'cover-back' && <BackCover config={config} loadImage={isNear} />}
+            {leaf.itemType === 'cover-back' && <BackCover config={config} />}
             {leaf.itemType === 'flyleaf' && (
               <Flyleaf 
                 config={config} 
@@ -515,7 +512,6 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
                 item={leaf.originalItem}
                 isLeft={leaf.isLeft}
                 pageNumber={leaf.pageNumber}
-                loadImage={isNear}
               />
             )}
             {(leaf.itemType === 'spread-left' || leaf.itemType === 'spread-right') && (
@@ -523,7 +519,6 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
                 item={leaf.originalItem}
                 isLeft={leaf.itemType === 'spread-left'}
                 pageNumber={leaf.pageNumber}
-                loadImage={isNear}
               />
             )}
             {leaf.itemType === 'credit' && (
@@ -534,8 +529,7 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
               />
             )}
           </div>
-          );
-        })}
+        ))}
       </div>
 
       {/* Centering Book Stage Container: Positions closed front/back cover or open spread precisely at viewport center */}

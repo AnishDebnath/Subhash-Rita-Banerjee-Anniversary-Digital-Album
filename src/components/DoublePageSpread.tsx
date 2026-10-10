@@ -6,14 +6,12 @@ interface DoublePageSpreadLeafProps {
   item: AlbumItemConfig;
   isLeft: boolean;
   pageNumber?: number;
-  loadImage?: boolean;
 }
 
 export const DoublePageSpreadLeaf: React.FC<DoublePageSpreadLeafProps> = ({
   item,
   isLeft,
   pageNumber,
-  loadImage = true,
 }) => {
   const imageSrc = item.src || item.fallbackSrc || assets.page02;
 
@@ -37,7 +35,6 @@ export const DoublePageSpreadLeaf: React.FC<DoublePageSpreadLeafProps> = ({
           height: '100%',
         }}
       >
-        {loadImage && (
         <img
           src={imageSrc}
           onError={(e) => {
@@ -51,7 +48,6 @@ export const DoublePageSpreadLeaf: React.FC<DoublePageSpreadLeafProps> = ({
           decoding="async"
           draggable={false}
         />
-        )}
 
         {/* Paper texture overlay for authentic photographic print look */}
         <div className="absolute inset-0 paper-matte-texture pointer-events-none mix-blend-overlay opacity-60" />
