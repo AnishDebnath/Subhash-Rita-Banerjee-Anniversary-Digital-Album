@@ -417,6 +417,61 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleNext, handlePrev, handleRestart, totalPages]);
 
+  // Touch tap navigation: quick tap (<250ms, <10px move) flips page — left half = prev, right half = next.
+  // page-flip lib needs 250ms hold for tap flip; fast taps never register there, so we handle them.
+  // Release at >=250ms skips our handler and lets lib's own flip run (no double-flip).
+  useEffect(() => {
+    const el = bookMountRef.current;
+    if (!el) return;
+
+    let downX = 0;
+    let downY = 0;
+    let downTime = 0;
+
+    const onDown = (e: PointerEvent) => {
+      if (e.pointerType !== 'touch') return;
+      if ((e.target as HTMLElement | null)?.closest('a,button')) return;
+      downX = e.clientX;
+      downY = e.clientY;
+      downTime = Date.now();
+    };
+
+    const onUp = (e: PointerEvent) => {
+      if (e.pointerType !== 'touch' || downTime === 0) return;
+      const duration = Date.now() - downTime;
+      downTime = 0;
+      if (duration >= 250) return;
+      if (Math.hypot(e.clientX - downX, e.clientY - downY) > 10) return;
+
+      const pf = pageFlipRef.current;
+      if (!pf || pf.getState() !== 'read') return;
+
+      const cur = pf.getCurrentPageIndex();
+      const total = pf.getPageCount();
+      if (cur === 0) {
+        handleNext();
+        return;
+      }
+      if (cur >= total - 1) {
+        handlePrev();
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+      if (e.clientX < rect.left + rect.width / 2) {
+        handlePrev();
+      } else {
+        handleNext();
+      }
+    };
+
+    el.addEventListener('pointerdown', onDown);
+    el.addEventListener('pointerup', onUp);
+    return () => {
+      el.removeEventListener('pointerdown', onDown);
+      el.removeEventListener('pointerup', onUp);
+    };
+  }, [handleNext, handlePrev]);
+
   // Spread label & title calculation
   const { currentSpreadLabel, currentSpreadTitle } = useMemo(() => {
     if (currentPage === 0) {

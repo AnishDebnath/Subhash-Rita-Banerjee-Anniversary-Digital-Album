@@ -1,57 +1,36 @@
-import frontCover from './Front cover.jpg';
-import backCover from './Back cover.jpg';
 import backgroundMusic from './background-music.mp3';
-import page01 from './page-01.jpg';
-import page02 from './page-02.jpg';
-import page03 from './page-03.jpg';
-import page04 from './page-04.jpg';
-import page05 from './page-05.jpg';
-import page06 from './page-06.jpg';
-import page07 from './page-07.jpg';
-import page08 from './page-08.jpg';
-import page09 from './page-09.jpg';
-import page10 from './page-10.jpg';
-import page11 from './page-11.jpg';
-import page12 from './page-12.jpg';
-import page13 from './page-13.jpg';
-import page14 from './page-14.jpg';
-import page15 from './page-15.jpg';
-import page16 from './page-16.jpg';
-import page17 from './page-17.jpg';
-import page18 from './page-18.jpg';
-import page19 from './page-19.jpg';
-import page20 from './page-20.jpg';
-import page21 from './page-21.jpg';
-import page22 from './page-22.jpg';
-import page23 from './page-23.jpg';
-import page24 from './page-24.jpg';
+import { cloudinaryFiles } from './cloudinaryImages';
+
+const baseUrl = (import.meta.env.VITE_CLOUDINARY_BASE_URL ?? '').replace(/\/+$/, '');
+
+const cloud = (key: string): string => `${baseUrl}/${cloudinaryFiles[key]}`;
 
 export const assets = {
-  frontCover,
-  backCover,
+  frontCover: cloud('front-cover'),
+  backCover: cloud('back-cover'),
   backgroundMusic,
-  page01,
-  page02,
-  page03,
-  page04,
-  page05,
-  page06,
-  page07,
-  page08,
-  page09,
-  page10,
-  page11,
-  page12,
-  page13,
-  page14,
-  page15,
-  page16,
-  page17,
-  page18,
-  page19,
-  page20,
-  page21,
-  page22,
-  page23,
-  page24,
+  page01: cloud('page-01'),
+  page02: cloud('page-02'),
+  page03: cloud('page-03'),
+  page04: cloud('page-04'),
+  page05: cloud('page-05'),
+  page06: cloud('page-06'),
+  page07: cloud('page-07'),
+  page08: cloud('page-08'),
+  page09: cloud('page-09'),
+  page10: cloud('page-10'),
+  page11: cloud('page-11'),
+  page12: cloud('page-12'),
+  page13: cloud('page-13'),
+  page14: cloud('page-14'),
+  page15: cloud('page-15'),
+  page16: cloud('page-16'),
+  page17: cloud('page-17'),
+  page18: cloud('page-18'),
+  page19: cloud('page-19'),
+  page20: cloud('page-20'),
+  page21: cloud('page-21'),
+  page22: cloud('page-22'),
+  page23: cloud('page-23'),
+  page24: cloud('page-24'),
 };

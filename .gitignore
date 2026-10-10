@@ -1,8 +1,29 @@
+# Dependencies
 node_modules/
+
+# Builds
 build/
 dist/
-coverage/
-.DS_Store
-*.log
-.env*
+
+# Environment files — keep real values private; only the empty template is committed
+.env
+.env.*
 !.env.example
+
+# Tests
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Vercel
+.vercel/

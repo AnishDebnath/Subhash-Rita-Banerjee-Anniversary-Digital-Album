@@ -47,10 +47,11 @@ src/
 ├── main.tsx                   # React root: createRoot + StrictMode
 ├── App.tsx                    # App shell, mounts AlbumViewer
 ├── index.css                  # Global styles
-├── assets/                    # Album images, imported via src/assets/index.ts
-│   ├── index.ts               # Central image import map (`assets.*` exports)
-│   ├── Front cover.jpg        # Front cover image
-│   ├── Back cover.jpg         # Back cover image
+├── assets/                    # Album images: Cloudinary URLs via env, local copies as fallback
+│   ├── index.ts               # `assets.*` = Cloudinary URL only (`${VITE_CLOUDINARY_BASE_URL}/<public_id>`)
+│   ├── cloudinaryImages.ts    # Cloudinary public_id map (mindtrix-media, v1791649244)
+│   ├── front-cover.jpg        # Front cover image
+│   ├── back-cover.jpg         # Back cover image
 │   ├── background-music.mp3   # Looping background music (plays by default)
 │   └── page-01.jpg … page-24.jpg  # Interior pages, in book order
 ├── components/
@@ -79,10 +80,12 @@ src/
 ## 🛠️ How to Customize the Album
 
 ### 1. Replace Photographs
-Drop your high-resolution JPG, PNG, or WebP images into `/src/assets/` (update imports in `src/assets/index.ts`):
-- **Cover**: `Front cover.jpg` / `Back cover.jpg`.
-- **Interior pages**: `page-01.jpg` … `page-NN.jpg` in book order. After opening the cover, `page-01.jpg` shows first on the right; numbering continues (`Page 01`, then `Pages 02–03`, `Pages 04–05`, …).
-- **Aspect ratio**: 3:2 landscape recommended (e.g. 3000 × 2000 px).
+Photos come from Cloudinary only. To swap or add a photo:
+1. Upload the image to your Cloudinary account.
+2. Open `src/assets/cloudinaryImages.ts`.
+3. Put the image's Cloudinary file name in the matching slot (`page-05`, `front-cover`, …).
+- Aspect ratio: 3:2 landscape (e.g. 3000 × 2000 px).
+- Background music stays local (`src/assets/background-music.mp3`).
 
 ### 2. Edit `src/data/album.config.ts`
 Modify the couple's names, date, venue, photographer details, or reorder/add pages:
@@ -118,11 +121,23 @@ export const albumConfig: AlbumConfig = {
 
 ## 🚀 Development & Deployment
 
+### How the Photos Load
+All photos (front cover, back cover, page-01 … page-24) are stored on **Cloudinary** (online image hosting). The website downloads them from there — not from the project folder.
+
+3 things make it work:
+1. **Your Cloudinary link** lives in a file called `.env` (one line: `VITE_CLOUDINARY_BASE_URL=...`). This file stays private on your computer.
+2. **Photo names** are listed in `src/assets/cloudinaryImages.ts`. Each line pairs a page (`page-01`) with its Cloudinary file name (`page-01_xxxxx.jpg`). Copy the file name from Cloudinary's website after uploading.
+3. **Missing name = blank page.** Every one of the 26 keys must have a Cloudinary file name. Right now only `page-22` is filled — add the other 25.
+
 ### Run Locally
 ```bash
 npm install
+cp .env.example .env   # then paste your Cloudinary link into .env
 npm run dev
 ```
+
+### Deploy on Vercel
+`.env` is NOT uploaded automatically. Add the same variable in Vercel: Project → Settings → Environment Variables → add `VITE_CLOUDINARY_BASE_URL` → Redeploy.
 
 ### Build for Production
 ```bash
@@ -148,4 +163,4 @@ Crawl files in `public/` (copied to site root at build):
 
 ### Before deploying, replace placeholders:
 1. Domain `https://example.com` appears in: `index.html` (canonical, `og:url`, `og:image`, `twitter:image`, JSON-LD), `public/robots.txt`, `public/sitemap.xml`.
-2. Provide social preview image: copy a suitable cover export to `public/og-cover.jpg` (recommended 1200 × 630 px) or update `og:image` / `twitter:image` paths.
+2. Social preview image served from `public/og-cover.jpg` (linked as `/og-cover.jpg` in `og:image` / `twitter:image`). Recommended 1200 × 630 px. Facebook/LinkedIn require absolute URLs — once real domain known, prefix path with it (e.g. `https://your-domain.com/og-cover.jpg`).

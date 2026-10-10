@@ -40,6 +40,7 @@ declare module 'page-flip' {
     flip(pageIndex: number, corner?: 'top' | 'bottom'): void;
     getPageCount(): number;
     getCurrentPageIndex(): number;
+    getState(): string;
     on(event: string, callback: (e: any) => void): PageFlip;
     off(event: string): void;
   }
