@@ -32,7 +32,6 @@ export const SinglePage: React.FC<SinglePageProps> = ({
           alt={item.title || (pageNumber ? `Album page ${pageNumber} — Subhash & Rita Banerjee Anniversary` : 'Album photograph')}
           className="w-full h-full object-cover select-none pointer-events-none brightness-[0.98] contrast-[1.02]"
           style={{ aspectRatio: '3 / 2' }}
-          loading="lazy"
           decoding="async"
           draggable={false}
         />

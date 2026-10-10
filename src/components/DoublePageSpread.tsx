@@ -44,7 +44,6 @@ export const DoublePageSpreadLeaf: React.FC<DoublePageSpreadLeafProps> = ({
           }}
           alt={item.title || (pageNumber ? `Album spread ${pageNumber} — Subhash & Rita Banerjee Anniversary` : 'Album panoramic spread')}
           className="w-full h-full object-cover select-none pointer-events-none brightness-[0.98] contrast-[1.03]"
-          loading="lazy"
           decoding="async"
           draggable={false}
         />

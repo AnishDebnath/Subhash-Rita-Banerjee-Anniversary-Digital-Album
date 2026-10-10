@@ -70,7 +70,6 @@ export const BackCover: React.FC<BackCoverProps> = ({ config }) => {
             alt="Back cover — Subhash & Rita Banerjee Anniversary Digital Album"
             className="w-full h-full object-cover"
             style={{ aspectRatio: '3 / 2' }}
-            loading="lazy"
             decoding="async"
           />
         </div>

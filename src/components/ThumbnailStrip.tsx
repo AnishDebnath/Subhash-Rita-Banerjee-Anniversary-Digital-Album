@@ -190,7 +190,6 @@ export const ThumbnailStrip: React.FC<ThumbnailStripProps> = ({
                               width: '200%',
                               left: '0%',
                             }}
-                            loading="lazy"
                             decoding="async"
                           />
                         </div>
@@ -210,7 +209,6 @@ export const ThumbnailStrip: React.FC<ThumbnailStripProps> = ({
                               width: '200%',
                               left: '-100%',
                             }}
-                            loading="lazy"
                             decoding="async"
                           />
                         </div>
@@ -228,7 +226,6 @@ export const ThumbnailStrip: React.FC<ThumbnailStripProps> = ({
                               alt={displayName}
                               className="w-full h-full object-cover select-none pointer-events-none group-hover:scale-105 transition-transform duration-500"
                               style={{ aspectRatio: '3 / 2' }}
-                              loading="lazy"
                               decoding="async"
                             />
                           ) : (
