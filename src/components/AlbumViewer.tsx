@@ -560,6 +560,7 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
                 config={config} 
                 isLeft={leaf.isLeft}
                 isClosing={leaf.label.includes('Closing')}
+                originalItem={leaf.originalItem}
               />
             )}
             {leaf.itemType === 'single' && (
@@ -578,9 +579,11 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
             )}
             {leaf.itemType === 'credit' && (
               <PhotographerCredit 
-                credit={config.photographer}
+                credit={leaf.originalItem?.creditInfo || config.photographer}
                 isLeft={leaf.isLeft}
                 pageNumber={leaf.pageNumber}
+                date={config.weddingDate}
+                location={config.weddingLocation}
               />
             )}
           </div>

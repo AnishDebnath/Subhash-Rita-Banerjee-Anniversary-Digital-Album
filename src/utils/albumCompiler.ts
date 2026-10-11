@@ -35,7 +35,9 @@ export function compileAlbumLeaves(config: AlbumConfig): CompiledLeaf[] {
 
   // 2. Interior Items
   const interiorItems = config.items.filter(i => i.type !== 'cover' && i.type !== 'cover-back' && i.type !== 'credit');
-  const creditItem = config.items.find(i => i.type === 'credit');
+  const creditItems = config.items.filter(i => i.type === 'credit');
+  const openingCreditItem = creditItems[0];
+  const closingCreditItem = creditItems[1];
   const backCoverItem = config.items.find(i => i.type === 'cover-back');
 
   // If first interior item is a single page (e.g. page-00), let's create opening flyleaf on left, and page-00 on right!
@@ -45,22 +47,16 @@ export function compileAlbumLeaves(config: AlbumConfig): CompiledLeaf[] {
   // Let's check first interior item
   const firstItem = interiorItems[0];
   if (firstItem && firstItem.type === 'single') {
-    // Left leaf: Luxury Japanese silk / parchment flyleaf with wedding monogram
+    // Left leaf: Opening details page (TPH logo)
     leaves.push({
-      id: 'leaf-flyleaf-opening',
+      id: 'leaf-credit-opening',
       leafIndex: leaves.length,
-      itemType: 'flyleaf',
-      originalItem: {
-        id: 'flyleaf-opening',
-        type: 'single',
-        title: config.coupleNames,
-        subtitle: 'The Anniversary Album',
-        caption: config.weddingLocation,
-      },
+      itemType: 'credit',
+      originalItem: openingCreditItem as AlbumItemConfig,
       isLeft: true,
       pageNumber: 0,
       density: 'soft',
-      label: 'Endpaper',
+      label: 'Photographer Credits',
       previewSrc: assets.frontCover,
     });
     isNextLeft = false;
@@ -152,19 +148,53 @@ export function compileAlbumLeaves(config: AlbumConfig): CompiledLeaf[] {
     }
   }
 
-  // 3. Photographer Credit Page (positioned immediately before the back cover)
-  if (creditItem) {
+  // 3. Closing details page (Mindtrix Media logo) — right side, immediately before back cover
+  if (closingCreditItem) {
+    // Credit must land on an EVEN index (= right side). Odd index = left side.
+    if (leaves.length % 2 === 1) {
+      // Next slot is left side — insert filler flyleaf first so credit lands on the right
+      leaves.push({
+        id: `leaf-flyleaf-${leaves.length}`,
+        leafIndex: leaves.length,
+        itemType: 'flyleaf',
+        originalItem: {
+          id: `flyleaf-${leaves.length}`,
+          type: 'single',
+          title: config.coupleNames,
+        },
+        isLeft: true,
+        pageNumber: 0,
+        density: 'soft',
+        label: 'Interlude',
+      });
+    }
     leaves.push({
-      id: 'leaf-photographer-credit',
+      id: 'leaf-credit-closing',
       leafIndex: leaves.length,
       itemType: 'credit',
-      originalItem: creditItem,
-      isLeft: isNextLeft,
-      pageNumber: pageCounter++,
+      originalItem: closingCreditItem,
+      isLeft: false,
+      pageNumber: 0,
       density: 'soft',
-      label: 'Photographer Credits',
-      previewSrc: creditItem.src,
-      fallbackSrc: creditItem.fallbackSrc,
+      label: closingCreditItem.creditInfo?.studioName || 'Details',
+      previewSrc: closingCreditItem.creditInfo?.logoSrc,
+    });
+  } else if (openingCreditItem) {
+    leaves.push({
+      id: 'leaf-flyleaf-opening', // ponytail: swapped
+      leafIndex: leaves.length,
+      itemType: 'flyleaf',
+      originalItem: {
+        id: 'flyleaf-opening',
+        type: 'single',
+        title: config.coupleNames,
+        subtitle: 'Fin',
+        caption: 'Handcrafted Luxury Album',
+      },
+      isLeft: isNextLeft,
+      pageNumber: 0,
+      density: 'soft',
+      label: 'Endpaper',
     });
     isNextLeft = !isNextLeft;
   }

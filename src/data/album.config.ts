@@ -13,6 +13,8 @@
  */
 
 import { assets } from '@/assets';
+import tphLogo from '@/assets/tph.png';
+import mindtrixLogo from '@/assets/watermark.png';
 
 export interface AlbumDimensions {
   closedWidthInches: number;
@@ -32,6 +34,7 @@ export interface PhotographerCreditInfo {
   location?: string;
   quote?: string;
   logoSrc?: string;
+  showAlbumMeta?: boolean; // when false, album date/location lines are hidden
 }
 
 export type AlbumPageType = 'cover' | 'single' | 'spread' | 'credit' | 'cover-back';
@@ -51,6 +54,7 @@ export interface AlbumItemConfig {
   preserveOriginalImage?: boolean;
   // For photographer credit page
   creditInfo?: PhotographerCreditInfo;
+  isLeft?: boolean;
 }
 
 export interface AlbumConfig {
@@ -80,8 +84,8 @@ export interface AlbumConfig {
 export const albumConfig: AlbumConfig = {
   title: 'Subhash & Rita Banerjee Anniversary',
   coupleNames: 'Subhash & Rita Banerjee',
-  weddingDate: '',
-  weddingLocation: '',
+  weddingDate: '19 February 2026',
+  weddingLocation: 'Kolkata',
   defaultSize: 'standard',
   dimensions: {
     // Standard format: Closed 18" wide x 12" tall (3:2) | Open 36" wide x 12" tall (3:1)
@@ -129,6 +133,7 @@ export const albumConfig: AlbumConfig = {
     socialHandle: '@royalvows.fineart',
     location: 'Udaipur · Mumbai · London',
     quote: 'Every glance, every tear, every blessing preserved in timeless print.',
+    logoSrc: tphLogo,
   },
   items: [
     // Front cover
@@ -169,6 +174,34 @@ export const albumConfig: AlbumConfig = {
       type: 'cover-back',
       src: assets.backCover,
       title: 'Subhash & Rita Banerjee',
+    },
+    // Credit / details page (first left side — TPH logo)
+    {
+      id: 'credit-tph',
+      type: 'credit',
+      isLeft: true,
+      creditInfo: {
+        photographerName: '',
+        studioName: 'The Photographer House',
+        role: '',
+        websiteUrl: 'https://www.thephotographerhouse.com',
+        quote: 'Where Every Click Tells a Story',
+        logoSrc: tphLogo,
+      },
+    },
+    // Credit / details page (last right side — Mindtrix Media logo)
+    {
+      id: 'credit-mindtrix',
+      type: 'credit',
+      creditInfo: {
+        photographerName: '',
+        studioName: 'Mindtrix Media',
+        role: 'Digital Album Production',
+        websiteUrl: 'https://www.mindtrixmedia.com',
+        logoSrc: mindtrixLogo,
+        quote: 'This album is made with Mindtrix Media',
+        showAlbumMeta: false,
+      },
     },
   ],
 };

@@ -1,17 +1,17 @@
 import React from 'react';
-import { AlbumConfig } from '@/data/album.config';
+import { AlbumConfig, AlbumItemConfig } from '@/data/album.config';
+import tphLogo from '@/assets/tph.png';
 
 interface FlyleafProps {
   config: AlbumConfig;
   isLeft: boolean;
   isClosing?: boolean;
+  originalItem?: AlbumItemConfig;
 }
 
-export const Flyleaf: React.FC<FlyleafProps> = ({ config, isLeft, isClosing }) => {
-  const monogram = config.coupleNames
-    .split('&')
-    .map((part) => part.trim().charAt(0))
-    .join('&');
+export const Flyleaf: React.FC<FlyleafProps> = ({ config, isLeft, originalItem }) => {
+  const subtitle = originalItem?.subtitle || 'Fin';
+  const caption = originalItem?.caption || 'Handcrafted Luxury Album';
 
   return (
     <div 
@@ -44,40 +44,20 @@ export const Flyleaf: React.FC<FlyleafProps> = ({ config, isLeft, isClosing }) =
         <div className="absolute top-0 bottom-0 right-0 w-2.5 bg-gradient-to-l from-black/20 to-transparent pointer-events-none z-10" />
       )}
 
-      {/* Top Subtle Label */}
-      <div 
-        className="relative z-10 text-white/40 font-sans font-medium uppercase"
-        style={{
-          fontSize: 'clamp(7px, 2.4cqmin, 10px)',
-          letterSpacing: '0.22em',
-        }}
-      >
-        {isClosing ? 'Closing Chronicle' : 'Opening Endpaper'}
-      </div>
-
-      {/* Monogram Crest & Fine Art Lettering */}
+      {/* TPH Logo & Fine Art Lettering */}
       <div className="relative z-10 my-auto flex flex-col items-center max-w-sm px-2 w-full">
-        {/* Monogram Seal */}
-        <div 
-          className="rounded-full border border-[#d4af37]/40 flex items-center justify-center p-1 bg-[#0c0d10] shadow-md shrink-0"
+        {/* TPH Logo Seal */}
+        <img
+          src={tphLogo}
+          alt="TPH Logo"
+          className="mx-auto shrink-0"
           style={{
-            width: 'clamp(32px, 15cqmin, 72px)',
-            height: 'clamp(32px, 15cqmin, 72px)',
+            width: 'clamp(40px, 18cqmin, 88px)',
+            height: 'clamp(40px, 18cqmin, 88px)',
             marginBottom: 'clamp(4px, 2.5cqmin, 16px)',
+            objectFit: 'contain',
           }}
-        >
-          <div className="w-full h-full rounded-full border border-[#d4af37]/20 flex items-center justify-center">
-            <span 
-              className="font-sans-brand gold-foil-text font-bold"
-              style={{
-                fontSize: 'clamp(11px, 5.5cqmin, 24px)',
-                letterSpacing: '0.08em',
-              }}
-            >
-              {monogram || 'S&R'}
-            </span>
-          </div>
-        </div>
+        />
 
         {/* Couple Names */}
         <h2 
@@ -100,7 +80,7 @@ export const Flyleaf: React.FC<FlyleafProps> = ({ config, isLeft, isClosing }) =
             marginBottom: 'clamp(4px, 1.8cqmin, 10px)',
           }}
         >
-          {isClosing ? 'Forever & Always' : 'A Celebration of Lifetime Love'}
+          {subtitle}
         </p>
 
         {/* Divider */}
@@ -112,7 +92,7 @@ export const Flyleaf: React.FC<FlyleafProps> = ({ config, isLeft, isClosing }) =
           }}
         />
 
-        {/* Date & Location */}
+        {/* Date & Location / Caption */}
         <p 
           className="text-[#a09888] font-sans font-medium uppercase text-center"
           style={{
@@ -132,17 +112,28 @@ export const Flyleaf: React.FC<FlyleafProps> = ({ config, isLeft, isClosing }) =
         >
           {config.weddingLocation}
         </p>
-      </div>
 
-      {/* Footer Volume Mark */}
-      <div 
-        className="relative z-10 text-white/35 font-sans font-medium uppercase text-center"
-        style={{
-          fontSize: 'clamp(7px, 2.2cqmin, 10px)',
-          letterSpacing: '0.24em',
-        }}
-      >
-        {isClosing ? 'Archival Edition' : 'Volume I'}
+        {/* Divider */}
+        <div 
+          className="h-px bg-gradient-to-r from-transparent via-[#d4af37]/60 to-transparent" 
+          style={{
+            width: 'clamp(24px, 16cqmin, 72px)',
+            margin: 'clamp(4px, 2cqmin, 12px) auto',
+          }}
+        />
+
+        {/* Caption */}
+        <p 
+          className="font-sans font-medium text-[#dfba73]/90 text-center"
+          style={{
+            fontSize: 'clamp(8px, 2.9cqmin, 13px)',
+            letterSpacing: '0.12em',
+            marginTop: 'clamp(2px, 1cqmin, 6px)',
+            marginBottom: 'clamp(4px, 1.8cqmin, 10px)',
+          }}
+        >
+          {caption}
+        </p>
       </div>
     </div>
   );
