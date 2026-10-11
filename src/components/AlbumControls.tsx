@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
@@ -40,6 +40,14 @@ interface AlbumControlsProps {
   onChangeSize: (size: 'standard' | 'extended' | 'large') => void;
   onToggleThumbnails: () => void;
   showThumbnails: boolean;
+  // Shared visibility state (controlled by parent AlbumViewer)
+  isVisible: boolean;
+  isHovered: boolean;
+  setIsHovered: (v: boolean) => void;
+  showSettings: boolean;
+  setShowSettings: (v: boolean) => void;
+  showAbout: boolean;
+  setShowAbout: (v: boolean) => void;
 }
 
 export const AlbumControls: React.FC<AlbumControlsProps> = ({
@@ -68,59 +76,14 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
   onChangeSize,
   onToggleThumbnails,
   showThumbnails,
+  isVisible,
+  isHovered,
+  setIsHovered,
+  showSettings,
+  setShowSettings,
+  showAbout,
+  setShowAbout,
 }) => {
-  const [showSettings, setShowSettings] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
-  const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Inactivity fade timer: automatically hides controls after 4s of no interaction
-  useEffect(() => {
-    const resetTimer = () => {
-      setIsVisible(true);
-      if (fadeTimeoutRef.current) {
-        clearTimeout(fadeTimeoutRef.current);
-      }
-
-      // Do not auto-fade if user is actively hovering the bar or settings are open
-      if (!isHovered && !showSettings && !showThumbnails && !showAbout) {
-        fadeTimeoutRef.current = setTimeout(() => {
-          setIsVisible(false);
-        }, 4000);
-      }
-    };
-
-    const handleMouseMove = () => {
-      resetTimer();
-    };
-
-    const handleTouchStart = () => {
-      resetTimer();
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('touchstart', handleTouchStart);
-    resetTimer();
-
-    return () => {
-      if (fadeTimeoutRef.current) {
-        clearTimeout(fadeTimeoutRef.current);
-      }
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('touchstart', handleTouchStart);
-    };
-  }, [isHovered, showSettings, showThumbnails, showAbout]);
-
-  // Keep visible whenever settings or modals are open
-  useEffect(() => {
-    if (showSettings || showThumbnails || showAbout || isHovered) {
-      setIsVisible(true);
-      if (fadeTimeoutRef.current) {
-        clearTimeout(fadeTimeoutRef.current);
-      }
-    }
-  }, [showSettings, showThumbnails, showAbout, isHovered]);
 
   return (
     <>
@@ -214,7 +177,7 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
       {/* Bottom Detection Zone: Wakes up controls when cursor approaches bottom */}
       <div
         className="fixed bottom-0 left-0 right-0 h-24 z-40 pointer-events-auto"
-        onMouseEnter={() => setIsVisible(true)}
+        onMouseEnter={() => setIsHovered(true)}
       />
 
       {/* Bottom-Left Editorial Metadata Status */}

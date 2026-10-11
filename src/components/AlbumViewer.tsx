@@ -65,6 +65,45 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
   const [showThumbnails, setShowThumbnails] = useState<boolean>(false);
   const [renewalDue, setRenewalDue] = useState<boolean>(() => isRenewalDue());
 
+  // UI visibility state (shared with controls & countdown)
+  const [uiVisible, setUiVisible] = useState<boolean>(true);
+  const [uiHovered, setUiHovered] = useState<boolean>(false);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [showAbout, setShowAbout] = useState<boolean>(false);
+  const fadeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Inactivity fade timer: automatically hides UI after 4s of no interaction
+  useEffect(() => {
+    const resetTimer = () => {
+      setUiVisible(true);
+      if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
+      if (!uiHovered && !showSettings && !showThumbnails && !showAbout) {
+        fadeTimerRef.current = setTimeout(() => setUiVisible(false), 4000);
+      }
+    };
+
+    const handleMouseMove = () => resetTimer();
+    const handleTouchStart = () => resetTimer();
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchstart', handleTouchStart);
+    resetTimer();
+
+    return () => {
+      if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchstart', handleTouchStart);
+    };
+  }, [uiHovered, showSettings, showThumbnails, showAbout]);
+
+  // Keep visible whenever settings/about/thumbnails open or hovered
+  useEffect(() => {
+    if (showSettings || showThumbnails || showAbout || uiHovered) {
+      setUiVisible(true);
+      if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
+    }
+  }, [showSettings, showThumbnails, showAbout, uiHovered]);
+
   // Compile leaves
   const leaves: CompiledLeaf[] = useMemo(() => compileAlbumLeaves(config), [config]);
 
@@ -710,11 +749,18 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
         }}
         onToggleThumbnails={() => setShowThumbnails(prev => !prev)}
         showThumbnails={showThumbnails}
+        isVisible={uiVisible}
+        isHovered={uiHovered}
+        setIsHovered={setUiHovered}
+        showSettings={showSettings}
+        setShowSettings={setShowSettings}
+        showAbout={showAbout}
+        setShowAbout={setShowAbout}
       />
 
       {/* Vertical / Portrait Mode Rotate Screen Prompt Overlay */}
       <RotateScreenOverlay isVisible={albumDimensions.isPortrait} />
-      {!renewalDue && <RenewalCountdown onExpire={() => setRenewalDue(true)} />}
+      {!renewalDue && <RenewalCountdown onExpire={() => setRenewalDue(true)} isVisible={uiVisible} />}
       {renewalDue && <RenewalOverlay />}
 
       {/* All Spreads Overview Modal */}

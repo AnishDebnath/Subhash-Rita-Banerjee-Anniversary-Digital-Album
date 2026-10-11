@@ -5,9 +5,10 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
 interface RenewalCountdownProps {
   onExpire?: () => void;
+  isVisible: boolean;
 }
 
-export const RenewalCountdown: React.FC<RenewalCountdownProps> = ({ onExpire }) => {
+export const RenewalCountdown: React.FC<RenewalCountdownProps> = ({ onExpire, isVisible }) => {
   const [remaining, setRemaining] = useState(() => msUntilRenewal());
 
   useEffect(() => {
@@ -29,7 +30,9 @@ export const RenewalCountdown: React.FC<RenewalCountdownProps> = ({ onExpire }) 
 
   return (
     <div
-      className="fixed top-3 right-3 sm:top-4 sm:right-4 z-50 pointer-events-none select-none rounded-full bg-white/90 border border-neutral-200/80 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.06)] px-3 py-1.5 sm:px-4 sm:py-2 flex items-baseline gap-1.5 sm:gap-2 whitespace-nowrap"
+      className={`fixed top-3 right-3 sm:top-4 sm:right-4 z-50 pointer-events-none select-none rounded-full bg-white/90 border border-neutral-200/80 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.06)] px-3 py-1.5 sm:px-4 sm:py-2 flex items-baseline gap-1.5 sm:gap-2 whitespace-nowrap transition-all duration-700 ease-out ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+      }`}
       aria-label="Album renewal countdown"
     >
       <span
