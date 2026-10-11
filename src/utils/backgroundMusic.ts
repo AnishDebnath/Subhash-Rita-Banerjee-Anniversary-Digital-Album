@@ -10,31 +10,49 @@ class BackgroundMusicManager {
     if (this.audio) return;
     this.audio = new Audio(assets.backgroundMusic);
     this.audio.loop = true;
-    this.audio.preload = 'none';
+    this.audio.preload = 'auto';
     this.audio.volume = this.isMuted ? 0 : this.volume;
   }
 
-  private bindGestureRetry() {
+  private handleGesture = () => {
+    // Must call play() synchronously inside the gesture handler (iOS/Android rule)
+    this.audio?.play()
+      .then(() => this.unbindGesture())
+      .catch(() => {
+        // Still blocked — keep listeners armed for the next gesture
+      });
+  };
+
+  private bindGesture() {
     if (this.gestureBound) return;
     this.gestureBound = true;
-    const resume = () => {
-      this.audio?.play().catch(() => {});
-      window.removeEventListener('pointerdown', resume);
-      window.removeEventListener('keydown', resume);
-      window.removeEventListener('touchstart', resume);
-      this.gestureBound = false;
-    };
-    window.addEventListener('pointerdown', resume);
-    window.addEventListener('keydown', resume);
-    window.addEventListener('touchstart', resume);
+    window.addEventListener('pointerdown', this.handleGesture);
+    window.addEventListener('touchend', this.handleGesture);
+    window.addEventListener('click', this.handleGesture);
+    window.addEventListener('keydown', this.handleGesture);
+  }
+
+  private unbindGesture() {
+    if (!this.gestureBound) return;
+    this.gestureBound = false;
+    window.removeEventListener('pointerdown', this.handleGesture);
+    window.removeEventListener('touchend', this.handleGesture);
+    window.removeEventListener('click', this.handleGesture);
+    window.removeEventListener('keydown', this.handleGesture);
   }
 
   public start() {
     this.init();
     if (!this.audio) return;
-    // Defer fetch until window load so images get bandwidth first
+    // Mobile/tablet block autoplay — arm gesture unlock immediately, not after a failed play()
+    this.bindGesture();
+    // Desktop autoplay attempt (works when policy allows)
     const kick = () => {
-      this.audio?.play().catch(() => this.bindGestureRetry());
+      this.audio?.play()
+        .then(() => this.unbindGesture())
+        .catch(() => {
+          // Blocked — gesture listeners stay armed
+        });
     };
     if (document.readyState === 'complete') {
       kick();
