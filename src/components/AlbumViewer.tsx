@@ -14,6 +14,9 @@ import { ThumbnailStrip } from './ThumbnailStrip';
 import { RotateScreenOverlay } from './RotateScreenOverlay';
 import { pageSound } from '@/utils/audio';
 import { backgroundMusic } from '@/utils/backgroundMusic';
+import { RenewalCountdown } from './RenewalCountdown';
+import { RenewalOverlay } from './RenewalOverlay';
+import { isRenewalDue } from '@/utils/renewal';
 
 interface AlbumViewerProps {
   config: AlbumConfig;
@@ -60,14 +63,19 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
   const [isMuted, setIsMuted] = useState<boolean>(!config.soundEffects.enabled);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [showThumbnails, setShowThumbnails] = useState<boolean>(false);
+  const [renewalDue, setRenewalDue] = useState<boolean>(() => isRenewalDue());
 
   // Compile leaves
   const leaves: CompiledLeaf[] = useMemo(() => compileAlbumLeaves(config), [config]);
 
   // Background music: play by default (falls back to first user gesture if autoplay blocked)
   useEffect(() => {
-    backgroundMusic.start();
-  }, []);
+    if (!renewalDue) {
+      backgroundMusic.start();
+    } else {
+      backgroundMusic.stop();
+    }
+  }, [renewalDue]);
 
   // Set total pages
   useEffect(() => {
@@ -706,6 +714,8 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
 
       {/* Vertical / Portrait Mode Rotate Screen Prompt Overlay */}
       <RotateScreenOverlay isVisible={albumDimensions.isPortrait} />
+      {!renewalDue && <RenewalCountdown onExpire={() => setRenewalDue(true)} />}
+      {renewalDue && <RenewalOverlay />}
 
       {/* All Spreads Overview Modal */}
       <ThumbnailStrip 

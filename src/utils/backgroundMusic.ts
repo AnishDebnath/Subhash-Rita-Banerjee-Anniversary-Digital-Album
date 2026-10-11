@@ -61,6 +61,13 @@ class BackgroundMusicManager {
     }
   }
 
+  public stop() {
+    if (this.audio) {
+      this.audio.pause();
+    }
+    this.unbindGesture();
+  }
+
   public setMuted(muted: boolean) {
     this.isMuted = muted;
     if (this.audio) {
