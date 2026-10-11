@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Play, 
-  Pause, 
-  RotateCcw, 
-  Maximize2, 
-  Minimize2, 
-  Volume2, 
-  VolumeX, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Pause,
+  RotateCcw,
+  Maximize2,
+  Minimize2,
+  Volume2,
+  VolumeX,
   LayoutGrid,
   SlidersHorizontal,
   X
@@ -127,16 +127,14 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
       {/* 
         Top Header: Center text part shown; left side logo name part and right side menu part commented out
       */}
-      <header 
-        className={`fixed top-0 left-0 right-0 z-40 ${
-          isShortLandscape 
-            ? 'px-4 pt-4 pb-1 sm:pt-5' 
-            : isMobile
+      <header
+        className={`fixed top-0 left-0 right-0 z-40 ${isShortLandscape
+          ? 'px-4 pt-4 pb-1 sm:pt-5'
+          : isMobile
             ? 'px-4 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1rem))] pb-2'
             : 'px-6 sm:px-10 pt-8 lg:pt-9 pb-2'
-        } flex items-center justify-center pointer-events-none transition-all duration-700 ease-out ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
-        }`}
+          } flex items-center justify-center pointer-events-none transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+          }`}
       >
         {/* Left side logo name part - commented out per user request */}
         {/* 
@@ -214,16 +212,15 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
       */}
 
       {/* Bottom Detection Zone: Wakes up controls when cursor approaches bottom */}
-      <div 
+      <div
         className="fixed bottom-0 left-0 right-0 h-24 z-40 pointer-events-auto"
         onMouseEnter={() => setIsVisible(true)}
       />
 
       {/* Bottom-Left Editorial Metadata Status */}
-      <div 
-        className={`fixed ${isShortLandscape ? 'bottom-2 left-4 text-[10px] hidden sm:flex' : 'bottom-6 left-6 sm:left-10 text-xs sm:text-sm'} z-40 pointer-events-auto flex items-center gap-2 font-sans transition-all duration-700 ease-out ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
-        }`}
+      <div
+        className={`fixed ${isShortLandscape ? 'bottom-2 left-4 text-[10px] hidden sm:flex' : 'bottom-6 left-6 sm:left-10 text-xs sm:text-sm'} z-40 pointer-events-auto flex items-center gap-2 font-sans transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+          }`}
       >
         <span className="font-semibold text-neutral-900 tracking-wide">
           {currentSpreadLabel}
@@ -239,10 +236,9 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
       </div>
 
       {/* Bottom-Right Minimal Interaction Guidance */}
-      <div 
-        className={`fixed bottom-6 right-6 sm:right-10 z-40 pointer-events-auto ${isShortLandscape ? 'hidden' : 'hidden md:flex'} items-center gap-2 text-[11px] font-sans text-neutral-400 tracking-wide transition-all duration-700 ease-out ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
-        }`}
+      <div
+        className={`fixed bottom-6 right-6 sm:right-10 z-40 pointer-events-auto ${isShortLandscape ? 'hidden' : 'hidden md:flex'} items-center gap-2 text-[11px] font-sans text-neutral-400 tracking-wide transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+          }`}
       >
         <span>← / → Page</span>
         <span aria-hidden="true">·</span>
@@ -252,12 +248,11 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
       </div>
 
       {/* Floating Bottom Navigation Pill Dock */}
-      <div 
-        className={`fixed ${isShortLandscape ? 'bottom-2 sm:bottom-3 scale-95' : 'bottom-5 sm:bottom-6'} left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-auto transition-all duration-700 ease-out ${
-          isVisible 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 translate-y-3 pointer-events-none'
-        }`}
+      <div
+        className={`fixed ${isShortLandscape ? 'bottom-2 sm:bottom-3 scale-95' : 'bottom-5 sm:bottom-6'} left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-auto transition-all duration-700 ease-out ${isVisible
+          ? 'opacity-100 translate-y-0'
+          : 'opacity-0 translate-y-3 pointer-events-none'
+          }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -267,7 +262,7 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
               <span className="font-sans font-semibold text-neutral-900 text-xs">Pacing &amp; Format</span>
-              <button 
+              <button
                 onClick={() => setShowSettings(false)}
                 className="p-1 rounded-md text-neutral-400 hover:text-neutral-900 transition-colors"
                 aria-label="Close settings"
@@ -284,11 +279,10 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
                   <button
                     key={sec}
                     onClick={() => onChangeInterval(sec)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-sans font-medium transition-all ${
-                      autoplayInterval === sec 
-                        ? 'bg-neutral-900 text-white shadow-xs' 
-                        : 'text-neutral-600 hover:text-neutral-900'
-                    }`}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-sans font-medium transition-all ${autoplayInterval === sec
+                      ? 'bg-neutral-900 text-white shadow-xs'
+                      : 'text-neutral-600 hover:text-neutral-900'
+                      }`}
                   >
                     {sec}s
                   </button>
@@ -325,7 +319,7 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
         )}
 
         {/* Minimalist Pill Dock */}
-        <nav 
+        <nav
           aria-label="Album Navigation Controls"
           className="flex items-center gap-1 sm:gap-1.5 px-3 py-1.5 bg-white/95 backdrop-blur-xl rounded-full border border-neutral-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.08)] ring-1 ring-black/5"
         >
@@ -355,11 +349,10 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             onClick={onToggleAutoplay}
             title={isAutoplay ? "Pause Slideshow" : "Play Slideshow"}
             aria-label={isAutoplay ? "Pause Slideshow" : "Play Slideshow"}
-            className={`p-2 rounded-full transition-all duration-300 active:scale-95 flex items-center justify-center ${
-              isAutoplay 
-                ? 'bg-neutral-900 text-white shadow-xs' 
-                : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
-            }`}
+            className={`p-2 rounded-full transition-all duration-300 active:scale-95 flex items-center justify-center ${isAutoplay
+              ? 'bg-neutral-900 text-white shadow-xs'
+              : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
+              }`}
           >
             {isAutoplay ? (
               <Pause className="w-4 h-4 fill-current" />
@@ -387,11 +380,10 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             onClick={onToggleThumbnails}
             title="Spreads Overview"
             aria-label="Toggle Spreads Overview"
-            className={`p-2 rounded-full transition-all active:scale-95 ${
-              showThumbnails 
-                ? 'text-neutral-950 bg-neutral-100 font-semibold' 
-                : 'text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100'
-            }`}
+            className={`p-2 rounded-full transition-all active:scale-95 ${showThumbnails
+              ? 'text-neutral-950 bg-neutral-100 font-semibold'
+              : 'text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100'
+              }`}
           >
             <LayoutGrid className="w-4 h-4" />
           </button>
@@ -401,11 +393,10 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             onClick={onToggleMute}
             title={isMuted ? "Unmute Sound" : "Mute Sound"}
             aria-label={isMuted ? "Unmute Sound" : "Mute Sound"}
-            className={`p-2 rounded-full transition-all active:scale-95 ${
-              isMuted 
-                ? 'text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100' 
-                : 'text-neutral-900 hover:bg-neutral-100'
-            }`}
+            className={`p-2 rounded-full transition-all active:scale-95 ${isMuted
+              ? 'text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100'
+              : 'text-neutral-900 hover:bg-neutral-100'
+              }`}
           >
             {isMuted ? (
               <VolumeX className="w-4 h-4" />
@@ -419,11 +410,10 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             onClick={() => setShowSettings(!showSettings)}
             title="Pacing & Dimensions"
             aria-label="Album Settings"
-            className={`p-2 rounded-full transition-all active:scale-95 ${
-              showSettings 
-                ? 'text-neutral-950 bg-neutral-100' 
-                : 'text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100'
-            }`}
+            className={`p-2 rounded-full transition-all active:scale-95 ${showSettings
+              ? 'text-neutral-950 bg-neutral-100'
+              : 'text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100'
+              }`}
           >
             <SlidersHorizontal className="w-4 h-4" />
           </button>
@@ -440,6 +430,26 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             ) : (
               <Maximize2 className="w-4 h-4" />
             )}
+          </button>
+
+          {/* Share Album */}
+          <button
+            onClick={async () => {
+              if (navigator.share) {
+                await navigator.share({
+                  title: 'Subhash & Rita Banerjee · Anniversary Digital Album',
+                  text: 'Anniversary Digital Album',
+                  url: window.location.href
+                });
+              } else {
+                await navigator.clipboard.writeText(window.location.href);
+              }
+            }}
+            title="Share Album"
+            aria-label="Share Album"
+            className={`px-4 py-2 rounded-full transition-all active:scale-95 bg-[#b8860b]/90 font-medium text-neutral-900 hover:bg-[#a77b0c]/95 hover:text-neutral-900 shadow-xs`}
+          >
+            Share
           </button>
         </nav>
       </div>
