@@ -5,10 +5,10 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
 interface RenewalCountdownProps {
   onExpire?: () => void;
-  isVisible: boolean;
+  className?: string;
 }
 
-export const RenewalCountdown: React.FC<RenewalCountdownProps> = ({ onExpire, isVisible }) => {
+export const RenewalCountdown: React.FC<RenewalCountdownProps> = ({ onExpire, className = '' }) => {
   const [remaining, setRemaining] = useState(() => msUntilRenewal());
 
   useEffect(() => {
@@ -28,23 +28,16 @@ export const RenewalCountdown: React.FC<RenewalCountdownProps> = ({ onExpire, is
   const minutes = Math.floor((clamped % 3_600_000) / 60_000);
   const seconds = Math.floor((clamped % 60_000) / 1000);
 
+  // ponytail: clean badge using standard Tailwind responsive units instead of detached fixed position
   return (
     <div
-      className={`fixed top-3 right-3 sm:top-4 sm:right-4 z-50 pointer-events-none select-none rounded-full bg-white/90 border border-neutral-200/80 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.06)] px-3 py-1.5 sm:px-4 sm:py-2 flex items-baseline gap-1.5 sm:gap-2 whitespace-nowrap transition-all duration-700 ease-out ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-      }`}
+      className={`select-none rounded-full bg-white/90 border border-neutral-200/80 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.06)] px-2.5 py-1 sm:px-3 sm:py-1.5 lg:px-4 lg:py-2 flex items-baseline gap-1 sm:gap-1.5 lg:gap-2 whitespace-nowrap ${className}`}
       aria-label="Album renewal countdown"
     >
-      <span
-        className="text-neutral-500 font-sans font-semibold uppercase shrink-0"
-        style={{ fontSize: 'clamp(6px, 1.8cqmin, 9px)', letterSpacing: '0.22em' }}
-      >
+      <span className="text-neutral-500 font-sans font-semibold uppercase shrink-0 text-[8px] sm:text-[9px] tracking-[0.14em] sm:tracking-[0.2em]">
         Renewal In
       </span>
-      <span
-        className="text-neutral-900 font-sans-brand font-bold tabular-nums"
-        style={{ fontSize: 'clamp(11px, 3.2cqmin, 15px)', letterSpacing: '0.04em' }}
-      >
+      <span className="text-neutral-900 font-sans-brand font-bold tabular-nums text-[11px] sm:text-xs lg:text-sm tracking-[0.02em] sm:tracking-[0.04em]">
         {days}<span className="text-[#b8860b]/80 text-[0.72em]">d</span>{' '}
         {pad(hours)}<span className="text-[#b8860b]/80 text-[0.72em]">h</span>{' '}
         {pad(minutes)}<span className="text-[#b8860b]/80 text-[0.72em]">m</span>{' '}

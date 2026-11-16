@@ -14,7 +14,6 @@ import { ThumbnailStrip } from './ThumbnailStrip';
 import { RotateScreenOverlay } from './RotateScreenOverlay';
 import { pageSound } from '@/utils/audio';
 import { backgroundMusic } from '@/utils/backgroundMusic';
-import { RenewalCountdown } from './RenewalCountdown';
 import { RenewalOverlay } from './RenewalOverlay';
 import { isRenewalDue } from '@/utils/renewal';
 
@@ -475,9 +474,19 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
     let downY = 0;
     let downTime = 0;
 
+    const hideUiOnMobile = () => {
+      if (albumDimensions.isMobile) {
+        setUiVisible(false);
+      }
+    };
+
     const onDown = (e: PointerEvent) => {
       if (e.pointerType !== 'touch') return;
       if ((e.target as HTMLElement | null)?.closest('a,button')) return;
+      
+      // Hide UI immediately on mobile when interacting with album
+      hideUiOnMobile();
+      
       downX = e.clientX;
       downY = e.clientY;
       downTime = Date.now();
@@ -511,13 +520,21 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
       }
     };
 
+    // Also hide on click (for page-flip's click-to-flip) on mobile
+    const onClick = (e: MouseEvent) => {
+      if ((e.target as HTMLElement | null)?.closest('a,button')) return;
+      hideUiOnMobile();
+    };
+
     el.addEventListener('pointerdown', onDown);
     el.addEventListener('pointerup', onUp);
+    el.addEventListener('click', onClick);
     return () => {
       el.removeEventListener('pointerdown', onDown);
       el.removeEventListener('pointerup', onUp);
+      el.removeEventListener('click', onClick);
     };
-  }, [handleNext, handlePrev]);
+  }, [handleNext, handlePrev, albumDimensions.isMobile]);
 
   // Spread label & title calculation
   const { currentSpreadLabel, currentSpreadTitle } = useMemo(() => {
@@ -570,6 +587,7 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
     return leaves.map(leaf => ({
       pageIndex: leaf.leafIndex,
       itemType: leaf.itemType,
+      originalItem: leaf.originalItem,
       isLeft: leaf.isLeft,
       pageNumber: leaf.pageNumber,
       label: leaf.label,
@@ -756,11 +774,12 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
         setShowSettings={setShowSettings}
         showAbout={showAbout}
         setShowAbout={setShowAbout}
+        renewalDue={renewalDue}
+        onRenewalExpire={() => setRenewalDue(true)}
       />
 
       {/* Vertical / Portrait Mode Rotate Screen Prompt Overlay */}
       <RotateScreenOverlay isVisible={albumDimensions.isPortrait} />
-      {!renewalDue && <RenewalCountdown onExpire={() => setRenewalDue(true)} isVisible={uiVisible} />}
       {renewalDue && <RenewalOverlay />}
 
       {/* All Spreads Overview Modal */}

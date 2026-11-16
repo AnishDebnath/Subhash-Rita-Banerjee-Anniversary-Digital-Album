@@ -13,6 +13,7 @@ import {
   SlidersHorizontal,
   X
 } from 'lucide-react';
+import { RenewalCountdown } from './RenewalCountdown';
 
 interface AlbumControlsProps {
   currentPage: number;
@@ -48,6 +49,8 @@ interface AlbumControlsProps {
   setShowSettings: (v: boolean) => void;
   showAbout: boolean;
   setShowAbout: (v: boolean) => void;
+  renewalDue?: boolean;
+  onRenewalExpire?: () => void;
 }
 
 export const AlbumControls: React.FC<AlbumControlsProps> = ({
@@ -83,70 +86,28 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
   setShowSettings,
   showAbout,
   setShowAbout,
+  renewalDue = false,
+  onRenewalExpire,
 }) => {
 
   return (
     <>
       {/* 
-        Top Header: Center text part shown; left side logo name part and right side menu part commented out
+        Top Header: Centered Renewal Countdown Timer
+        ponytail: top name removed per user request; countdown timer placed directly in the top center.
       */}
       <header
         className={`fixed top-0 left-0 right-0 z-40 ${isShortLandscape
-          ? 'px-4 pt-4 pb-1 sm:pt-5'
+          ? 'px-3 pt-2.5 sm:px-5 sm:pt-3'
           : isMobile
-            ? 'px-4 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1rem))] pb-2'
-            : 'px-6 sm:px-10 pt-8 lg:pt-9 pb-2'
+            ? 'px-4 pt-[max(1.5rem,calc(env(safe-area-inset-top)+0.5rem))] pb-2'
+            : 'px-6 sm:px-10 pt-6 lg:pt-8 pb-2'
           } flex items-center justify-center pointer-events-none transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
           }`}
       >
-        {/* Left side logo name part - commented out per user request */}
-        {/* 
-        <div className="flex items-center pointer-events-auto">
-          <button 
-            onClick={onRestart}
-            className={`${isShortLandscape ? 'text-sm font-semibold' : 'text-base sm:text-lg font-bold'} font-sans-brand tracking-tight text-neutral-900 hover:text-black transition-colors`}
-            title="Return to Cover"
-          >
-            Royal Vows®
-          </button>
-        </div>
-        */}
-
-        {/* Top Center Text Part */}
-        <div className="flex items-center pointer-events-auto">
-          <span className="text-xs sm:text-sm md:text-base font-sans font-medium uppercase tracking-[0.22em] text-[#5c5a54] select-none text-center">
-            {headerText}
-          </span>
-        </div>
-
-        {/* Right side menu part - commented out per user request */}
-        {/* 
-        <nav 
-          aria-label="Chronicle Navigation"
-          className={`flex items-center ${isShortLandscape ? 'gap-3 text-[11px]' : 'gap-4 sm:gap-6 text-xs'} pointer-events-auto font-sans font-medium text-neutral-700`}
-        >
-          <button
-            onClick={onToggleThumbnails}
-            className={`hover:text-black transition-colors ${showThumbnails ? 'text-black font-semibold' : ''}`}
-          >
-            Spreads
-          </button>
-
-          <button
-            onClick={() => setShowAbout(true)}
-            className="hover:text-black transition-colors"
-          >
-            About
-          </button>
-
-          <button
-            onClick={onToggleAutoplay}
-            className={`${isShortLandscape ? 'px-3 py-1 text-[11px]' : 'px-4 py-1.5 text-xs'} bg-neutral-900 text-white rounded-full font-medium hover:bg-neutral-800 active:scale-95 transition-all shadow-xs`}
-          >
-            {isAutoplay ? 'Pause' : 'Slideshow'}
-          </button>
-        </nav>
-        */}
+        {!renewalDue && (
+          <RenewalCountdown onExpire={onRenewalExpire} className="pointer-events-auto" />
+        )}
       </header>
 
       {/* Floating Side Navigation Chevrons: Commented out per user request */}

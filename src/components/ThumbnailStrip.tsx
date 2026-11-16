@@ -1,10 +1,13 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { AlbumConfig } from '@/data/album.config';
+import { AlbumConfig, AlbumItemConfig } from '@/data/album.config';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import tphLogo from '@/assets/tph.png';
+import mindtrixLogo from '@/assets/watermark.png';
 
 export interface ThumbnailItem {
   pageIndex: number;
   itemType: 'cover' | 'single' | 'spread-left' | 'spread-right' | 'credit' | 'flyleaf' | 'cover-back';
+  originalItem?: AlbumItemConfig;
   isLeft?: boolean;
   pageNumber?: number;
   label: string;
@@ -68,12 +71,16 @@ export const ThumbnailStrip: React.FC<ThumbnailStripProps> = ({
 
   if (!isOpen) return null;
 
-  // Compute clean display label: ONLY page numbers for content images, names for covers & details pages
+  // ponytail: compute clean display label using actual studio / couple names for details pages
   const getCardDisplayName = (item: ThumbnailItem) => {
     if (item.itemType === 'cover') return 'Front Cover';
     if (item.itemType === 'cover-back') return 'Back Cover';
-    if (item.itemType === 'flyleaf') return 'Left Details Page';
-    if (item.itemType === 'credit') return 'End Details Page';
+    if (item.itemType === 'credit') {
+      return item.originalItem?.creditInfo?.studioName || item.label || 'Details Page';
+    }
+    if (item.itemType === 'flyleaf') {
+      return item.originalItem?.title || item.label || 'Details Page';
+    }
     // Content images: show ONLY page number!
     return `Page ${item.pageNumber}`;
   };
@@ -143,37 +150,51 @@ export const ThumbnailStrip: React.FC<ThumbnailStripProps> = ({
                   >
                     {/* Image Area in 3:2 Ratio strictly */}
                     <div className="w-full aspect-[3/2] bg-neutral-900 overflow-hidden relative">
-                      {/* 1. Left Details Page (Flyleaf) */}
+                      {/* 1. Details Page (Flyleaf / Opening Details) */}
                       {item.itemType === 'flyleaf' ? (
-                        <div className="w-full h-full bg-[#101114] text-[#ede8de] flex flex-col items-center justify-center p-1.5 sm:p-2.5 relative select-none">
+                        <div className="w-full h-full bg-[#101114] text-[#ede8de] flex flex-col items-center justify-center p-2 relative select-none">
                           <div className="absolute inset-1 sm:inset-1.5 border border-[#c5a059]/25 pointer-events-none" />
-                          <div className="w-5 h-5 sm:w-7 sm:h-7 rounded-full border border-[#d4af37]/40 flex items-center justify-center mb-0.5 sm:mb-1 bg-[#0c0d10] shadow-xs shrink-0">
-                            <span className="text-[8px] sm:text-[10px] font-sans-brand gold-foil-text font-bold">A&amp;M</span>
-                          </div>
-                          <span className="text-[8px] sm:text-[10px] font-sans-brand gold-foil-text font-bold tracking-[0.14em] uppercase text-center px-1 truncate max-w-full">
+                          <img
+                            src={tphLogo}
+                            alt="TPH Logo"
+                            className="w-5 h-5 sm:w-6 sm:h-6 object-contain mb-1 shrink-0"
+                          />
+                          <span className="text-[7.5px] sm:text-[9px] font-sans-brand gold-foil-text font-bold tracking-[0.14em] uppercase text-center px-1 truncate max-w-full">
                             {config.coupleNames}
                           </span>
-                          <span className="text-[6.5px] sm:text-[8px] font-sans text-[#dfba73]/85 tracking-wider mt-0.5 uppercase">
-                            Details Page
+                          <span className="text-[6.5px] sm:text-[7.5px] font-sans text-[#dfba73]/85 tracking-wider mt-0.5 uppercase">
+                            {item.originalItem?.subtitle || 'Anniversary Edition'}
                           </span>
                         </div>
                       ) : item.itemType === 'credit' ? (
-                        /* 2. End Right Side Details Page (Photographer Credit) */
-                        <div className="w-full h-full bg-[#101114] text-[#ede8de] flex flex-col items-center justify-center p-1.5 sm:p-2.5 relative select-none">
-                          <div className="absolute inset-1 sm:inset-1.5 border border-[#c5a059]/25 pointer-events-none" />
-                          <div className="w-5 h-5 sm:w-7 sm:h-7 rounded-full border border-[#d4af37]/40 flex items-center justify-center mb-0.5 sm:mb-1 bg-[#0c0d10] shrink-0">
-                            <svg className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-[#d4af37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                          </div>
-                          <span className="text-[8px] sm:text-[9px] font-sans-brand gold-foil-text font-bold tracking-[0.12em] uppercase text-center px-1 truncate max-w-full">
-                            {config.photographer.studioName}
-                          </span>
-                          <span className="text-[6.5px] sm:text-[8px] font-sans text-[#dfba73]/85 tracking-wider mt-0.5 uppercase">
-                            Details Page
-                          </span>
-                        </div>
+                        /* 2. Details Page (Photographer / Studio / Production Credit matching main pages) */
+                        (() => {
+                          const credit = item.originalItem?.creditInfo || config.photographer;
+                          const isWideLogo = credit.studioName === 'Mindtrix Media';
+                          const logo = credit.logoSrc || (isWideLogo ? mindtrixLogo : tphLogo);
+                          return (
+                            <div className="w-full h-full bg-[#101114] text-[#ede8de] flex flex-col items-center justify-center p-2 relative select-none">
+                              <div className="absolute inset-1 sm:inset-1.5 border border-[#c5a059]/25 pointer-events-none" />
+                              {logo && (
+                                <img
+                                  src={logo}
+                                  alt={credit.studioName}
+                                  className={`mx-auto object-contain mb-1 shrink-0 ${
+                                    isWideLogo ? 'h-3.5 sm:h-4 w-auto max-w-[80%]' : 'w-5 h-5 sm:w-6 sm:h-6'
+                                  }`}
+                                />
+                              )}
+                              <span className="text-[7.5px] sm:text-[9px] font-sans-brand gold-foil-text font-bold tracking-[0.12em] uppercase text-center px-1 truncate max-w-full">
+                                {credit.studioName}
+                              </span>
+                              {credit.quote && (
+                                <span className="text-[6px] sm:text-[7.5px] font-sans text-[#dfba73]/85 tracking-wider mt-0.5 text-center px-1 truncate max-w-full">
+                                  {credit.quote}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()
                       ) : item.itemType === 'spread-left' ? (
                         /* 3. Continuous Spread Left Half (Page Image) */
                         <div className="w-full h-full relative overflow-hidden bg-neutral-900">
