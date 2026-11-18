@@ -11,7 +11,8 @@ import {
   VolumeX,
   LayoutGrid,
   SlidersHorizontal,
-  X
+  X,
+  Share2
 } from 'lucide-react';
 import { RenewalCountdown } from './RenewalCountdown';
 
@@ -89,6 +90,16 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
   renewalDue = false,
   onRenewalExpire,
 }) => {
+  const isMobileView = isMobile || isShortLandscape;
+
+  const handleShare = () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: document.title, url });
+    } else {
+      navigator.clipboard.writeText(url);
+    }
+  };
 
   return (
     <>
@@ -245,14 +256,18 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
         {/* Minimalist Pill Dock */}
         <nav
           aria-label="Album Navigation Controls"
-          className="flex items-center gap-1 sm:gap-1.5 px-3 py-1.5 bg-white/95 backdrop-blur-xl rounded-full border border-neutral-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.08)] ring-1 ring-black/5"
+          className={`flex items-center ${
+            isMobileView
+              ? 'gap-1 px-2 py-1 shadow-[0_6px_24px_rgba(0,0,0,0.08)]'
+              : 'gap-1.5 px-3 py-1.5 shadow-[0_10px_35px_rgba(0,0,0,0.08)]'
+          } bg-white/95 backdrop-blur-xl rounded-full border border-neutral-200/80 ring-1 ring-black/5`}
         >
           {/* 1. Restart Button */}
           <button
             onClick={onRestart}
             title="Restart to Front Cover (Home)"
             aria-label="Restart Album"
-            className="p-2 rounded-full text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 active:scale-95 transition-all group"
+            className={`${isMobileView ? 'p-1.5' : 'p-2'} rounded-full text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100 active:scale-95 transition-all group`}
           >
             <RotateCcw className="w-4 h-4 transition-transform duration-500 group-hover:-rotate-90" />
           </button>
@@ -263,9 +278,9 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             disabled={isCover}
             title="Previous Page (Left Arrow)"
             aria-label="Previous Page"
-            className="p-2 rounded-full text-neutral-700 hover:text-black hover:bg-neutral-100 disabled:opacity-30 disabled:hover:bg-transparent disabled:pointer-events-none active:scale-95 transition-all"
+            className={`${isMobileView ? 'p-1.5' : 'p-2'} rounded-full text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100 disabled:opacity-30 disabled:hover:bg-transparent disabled:pointer-events-none active:scale-95 transition-all`}
           >
-            <ChevronLeft className="w-4.5 h-4.5" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
 
           {/* 3. Play / Pause Button */}
@@ -273,10 +288,11 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             onClick={onToggleAutoplay}
             title={isAutoplay ? "Pause Slideshow" : "Play Slideshow"}
             aria-label={isAutoplay ? "Pause Slideshow" : "Play Slideshow"}
-            className={`p-2 rounded-full transition-all duration-300 active:scale-95 flex items-center justify-center ${isAutoplay
-              ? 'bg-neutral-900 text-white shadow-xs'
-              : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
-              }`}
+            className={`${isMobileView ? 'p-1.5' : 'p-2'} rounded-full transition-all duration-300 active:scale-95 flex items-center justify-center ${
+              isAutoplay
+                ? 'bg-neutral-900 text-white shadow-xs'
+                : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
+            }`}
           >
             {isAutoplay ? (
               <Pause className="w-4 h-4 fill-current" />
@@ -291,36 +307,38 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             disabled={isBackCover}
             title="Next Page (Right Arrow)"
             aria-label="Next Page"
-            className="p-2 rounded-full text-neutral-700 hover:text-black hover:bg-neutral-100 disabled:opacity-30 disabled:hover:bg-transparent disabled:pointer-events-none active:scale-95 transition-all"
+            className={`${isMobileView ? 'p-1.5' : 'p-2'} rounded-full text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100 disabled:opacity-30 disabled:hover:bg-transparent disabled:pointer-events-none active:scale-95 transition-all`}
           >
-            <ChevronRight className="w-4.5 h-4.5" />
+            <ChevronRight className="w-4 h-4" />
           </button>
 
           {/* Hairline Divider */}
-          <div className="w-px h-4 bg-neutral-200 mx-1" />
+          <div className="w-px h-4 bg-neutral-200 mx-0.5 sm:mx-1" />
 
           {/* Spreads Overview Grid */}
           <button
             onClick={onToggleThumbnails}
             title="Spreads Overview"
             aria-label="Toggle Spreads Overview"
-            className={`p-2 rounded-full transition-all active:scale-95 ${showThumbnails
-              ? 'text-neutral-950 bg-neutral-100 font-semibold'
-              : 'text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100'
-              }`}
+            className={`${isMobileView ? 'p-1.5' : 'p-2'} rounded-full transition-all active:scale-95 ${
+              showThumbnails
+                ? 'text-neutral-950 bg-neutral-100 font-semibold'
+                : 'text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100'
+            }`}
           >
             <LayoutGrid className="w-4 h-4" />
           </button>
 
-          {/* Sound Toggle: background music + page flip rustle */}
+          {/* Sound Toggle */}
           <button
             onClick={onToggleMute}
             title={isMuted ? "Unmute Sound" : "Mute Sound"}
             aria-label={isMuted ? "Unmute Sound" : "Mute Sound"}
-            className={`p-2 rounded-full transition-all active:scale-95 ${isMuted
-              ? 'text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100'
-              : 'text-neutral-900 hover:bg-neutral-100'
-              }`}
+            className={`${isMobileView ? 'p-1.5' : 'p-2'} rounded-full transition-all active:scale-95 ${
+              isMuted
+                ? 'text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100'
+                : 'text-neutral-900 hover:bg-neutral-100'
+            }`}
           >
             {isMuted ? (
               <VolumeX className="w-4 h-4" />
@@ -334,10 +352,11 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             onClick={() => setShowSettings(!showSettings)}
             title="Pacing & Dimensions"
             aria-label="Album Settings"
-            className={`p-2 rounded-full transition-all active:scale-95 ${showSettings
-              ? 'text-neutral-950 bg-neutral-100'
-              : 'text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100'
-              }`}
+            className={`${isMobileView ? 'p-1.5' : 'p-2'} rounded-full transition-all active:scale-95 ${
+              showSettings
+                ? 'text-neutral-950 bg-neutral-100'
+                : 'text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100'
+            }`}
           >
             <SlidersHorizontal className="w-4 h-4" />
           </button>
@@ -347,7 +366,7 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             onClick={onToggleFullscreen}
             title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
             aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-            className="p-2 rounded-full text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100 active:scale-95 transition-all"
+            className={`${isMobileView ? 'p-1.5' : 'p-2'} rounded-full text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100 active:scale-95 transition-all`}
           >
             {isFullscreen ? (
               <Minimize2 className="w-4 h-4" />
@@ -356,24 +375,17 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
             )}
           </button>
 
-          {/* Share Album */}
+          {/* Share Button */}
           <button
-            onClick={async () => {
-              if (navigator.share) {
-                await navigator.share({
-                  title: 'Subhash & Rita Banerjee · Anniversary Digital Album',
-                  text: 'Anniversary Digital Album',
-                  url: window.location.href
-                });
-              } else {
-                await navigator.clipboard.writeText(window.location.href);
-              }
-            }}
+            onClick={handleShare}
             title="Share Album"
             aria-label="Share Album"
-            className={`px-4 py-2 rounded-full transition-all active:scale-95 bg-[#b8860b]/90 font-medium text-neutral-900 hover:bg-[#a77b0c]/95 hover:text-neutral-900 shadow-xs`}
+            className={`${
+              isMobileView ? 'px-3 py-1.5 text-xs' : 'px-4 py-2 text-sm'
+            } rounded-full bg-[#b8860b]/90 font-medium text-neutral-900 hover:bg-[#a77b0c]/95 shadow-xs flex items-center gap-1.5 justify-center active:scale-95 transition-all`}
           >
-            Share
+            <Share2 className="w-3.5 h-3.5" />
+            <span>Share</span>
           </button>
         </nav>
       </div>
