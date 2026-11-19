@@ -6,9 +6,7 @@ import { compileAlbumLeaves, CompiledLeaf } from '@/utils/albumCompiler';
 import { Cover } from './Cover';
 import { BackCover } from './BackCover';
 import { SinglePage } from './SinglePage';
-import { DoublePageSpreadLeaf } from './DoublePageSpread';
 import { PhotographerCredit } from './PhotographerCredit';
-import { Flyleaf } from './Flyleaf';
 import { AlbumControls } from './AlbumControls';
 import { ThumbnailStrip } from './ThumbnailStrip';
 import { RotateScreenOverlay } from './RotateScreenOverlay';
@@ -68,7 +66,6 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
   const [uiVisible, setUiVisible] = useState<boolean>(true);
   const [uiHovered, setUiHovered] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
-  const [showAbout, setShowAbout] = useState<boolean>(false);
   const fadeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Inactivity fade timer: automatically hides UI after 4s of no interaction
@@ -76,7 +73,7 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
     const resetTimer = () => {
       setUiVisible(true);
       if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
-      if (!uiHovered && !showSettings && !showThumbnails && !showAbout) {
+      if (!uiHovered && !showSettings && !showThumbnails) {
         fadeTimerRef.current = setTimeout(() => setUiVisible(false), 4000);
       }
     };
@@ -93,15 +90,15 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchstart', handleTouchStart);
     };
-  }, [uiHovered, showSettings, showThumbnails, showAbout]);
+  }, [uiHovered, showSettings, showThumbnails]);
 
-  // Keep visible whenever settings/about/thumbnails open or hovered
+  // Keep visible whenever settings/thumbnails open or hovered
   useEffect(() => {
-    if (showSettings || showThumbnails || showAbout || uiHovered) {
+    if (showSettings || showThumbnails || uiHovered) {
       setUiVisible(true);
       if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
     }
-  }, [showSettings, showThumbnails, showAbout, uiHovered]);
+  }, [showSettings, showThumbnails, uiHovered]);
 
   // Compile leaves
   const leaves: CompiledLeaf[] = useMemo(() => compileAlbumLeaves(config), [config]);
@@ -552,14 +549,9 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
     let pageLabel = '';
     let title = '';
 
-    // If left is flyleaf (opening details) and right is content:
-    if (leftLeaf?.itemType === 'flyleaf' && rightLeaf && rightLeaf.itemType !== 'flyleaf') {
+    if (leftLeaf?.itemType === 'credit' && rightLeaf && rightLeaf.itemType !== 'credit') {
       pageLabel = `Page ${pad(rightLeaf.pageNumber)}`;
       title = rightLeaf.originalItem?.title || rightLeaf.label || '';
-    } else if (rightLeaf?.itemType === 'flyleaf' && leftLeaf && leftLeaf.itemType !== 'flyleaf') {
-      // Closing endpaper on the right: show left page number only
-      pageLabel = `Page ${pad(leftLeaf.pageNumber)}`;
-      title = leftLeaf.originalItem?.title || leftLeaf.label || '';
     } else if (rightLeaf?.itemType === 'credit' && leftLeaf && leftLeaf.itemType !== 'credit') {
       // If right is credit (closing details) and left is content:
       pageLabel = `Page ${pad(leftLeaf.pageNumber)}`;
@@ -576,9 +568,6 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
       title = leftLeaf?.originalItem?.title || '';
     }
 
-    // Clean up title (remove trailing (Left) or (Right) from spread titles)
-    title = title.replace(/\s*\((Left|Right)\)\s*$/i, '');
-
     return { currentSpreadLabel: pageLabel, currentSpreadTitle: title };
   }, [currentPage, totalPages, leaves]);
 
@@ -592,7 +581,6 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
       pageNumber: leaf.pageNumber,
       label: leaf.label,
       previewSrc: leaf.previewSrc,
-      fallbackSrc: leaf.fallbackSrc || leaf.originalItem?.fallbackSrc,
     }));
   }, [leaves]);
 
@@ -620,25 +608,10 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
           >
             {leaf.itemType === 'cover' && <Cover config={config} />}
             {leaf.itemType === 'cover-back' && <BackCover config={config} />}
-            {leaf.itemType === 'flyleaf' && (
-              <Flyleaf 
-                config={config} 
-                isLeft={leaf.isLeft}
-                isClosing={leaf.label.includes('Closing')}
-                originalItem={leaf.originalItem}
-              />
-            )}
             {leaf.itemType === 'single' && (
               <SinglePage 
                 item={leaf.originalItem}
                 isLeft={leaf.isLeft}
-                pageNumber={leaf.pageNumber}
-              />
-            )}
-            {(leaf.itemType === 'spread-left' || leaf.itemType === 'spread-right') && (
-              <DoublePageSpreadLeaf 
-                item={leaf.originalItem}
-                isLeft={leaf.itemType === 'spread-left'}
                 pageNumber={leaf.pageNumber}
               />
             )}
@@ -772,8 +745,6 @@ export const AlbumViewer: React.FC<AlbumViewerProps> = ({ config }) => {
         setIsHovered={setUiHovered}
         showSettings={showSettings}
         setShowSettings={setShowSettings}
-        showAbout={showAbout}
-        setShowAbout={setShowAbout}
         renewalDue={renewalDue}
         onRenewalExpire={() => setRenewalDue(true)}
       />

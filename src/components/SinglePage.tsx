@@ -1,6 +1,5 @@
 import React from 'react';
 import { AlbumItemConfig } from '@/data/album.config';
-import { assets } from '@/assets';
 
 interface SinglePageProps {
   item: AlbumItemConfig;
@@ -13,8 +12,6 @@ export const SinglePage: React.FC<SinglePageProps> = ({
   isLeft,
   pageNumber,
 }) => {
-  const imageSrc = item.src || item.fallbackSrc || assets.page01;
-
   return (
     <div 
       className="relative w-full h-full bg-[#0d0e11] overflow-hidden select-none"
@@ -23,17 +20,12 @@ export const SinglePage: React.FC<SinglePageProps> = ({
       {/* Full Bleed Edge-to-Edge Photograph in 3:2 ratio */}
       <div className="absolute inset-0 overflow-hidden flex items-center justify-center">
         <img
-          src={imageSrc}
-          onError={(e) => {
-            if (item.fallbackSrc && e.currentTarget.src !== window.location.origin + item.fallbackSrc) {
-              e.currentTarget.src = item.fallbackSrc;
-            }
-          }}
-          alt={item.title || (pageNumber ? `Album page ${pageNumber} — Subhash & Rita Banerjee Anniversary` : 'Album photograph')}
+          src={item.src}
+          alt={item.title || 'Album Page'}
           className="w-full h-full object-cover select-none pointer-events-none brightness-[0.98] contrast-[1.02]"
           style={{ aspectRatio: '3 / 2' }}
+          loading="eager"
           decoding="async"
-          draggable={false}
         />
       </div>
 

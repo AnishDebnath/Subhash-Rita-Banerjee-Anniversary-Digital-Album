@@ -1,6 +1,5 @@
 import React from 'react';
 import { AlbumConfig } from '@/data/album.config';
-import { assets } from '@/assets';
 
 interface CoverProps {
   config: AlbumConfig;
@@ -9,7 +8,7 @@ interface CoverProps {
 
 export const Cover: React.FC<CoverProps> = ({ config }) => {
   const frontCoverItem = config.items.find(i => i.type === 'cover');
-  const coverImage = frontCoverItem?.src || frontCoverItem?.fallbackSrc || assets.frontCover;
+  const coverImage = frontCoverItem?.src || '';
 
   return (
     <div 
@@ -32,15 +31,10 @@ export const Cover: React.FC<CoverProps> = ({ config }) => {
       {/* Layer 2 — Front Hardcover Board (Upper Part) */}
       <div className="absolute left-0 right-2 sm:right-2.5 top-0 bottom-2.5 sm:bottom-3 z-20 overflow-hidden rounded-tr-xs rounded-br-sm shadow-[2px_4px_10px_rgba(0,0,0,0.4)]">
         {/* Full-Bleed Centered Image */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
           <img 
             src={coverImage}
-            onError={(e) => {
-              if (frontCoverItem?.fallbackSrc && e.currentTarget.src !== window.location.origin + frontCoverItem.fallbackSrc) {
-                e.currentTarget.src = frontCoverItem.fallbackSrc;
-              }
-            }}
-            alt="Front cover — Subhash & Rita Banerjee Anniversary Digital Album"
+            alt="Front Cover"
             className="w-full h-full object-cover object-center"
             loading="eager"
             fetchPriority="high"

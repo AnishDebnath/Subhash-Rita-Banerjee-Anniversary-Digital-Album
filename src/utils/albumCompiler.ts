@@ -1,19 +1,18 @@
 import { AlbumConfig, AlbumItemConfig } from '@/data/album.config';
-import { assets } from '@/assets';
 
 export interface CompiledLeaf {
   id: string;
   leafIndex: number;
-  itemType: 'cover' | 'single' | 'spread-left' | 'spread-right' | 'credit' | 'flyleaf' | 'cover-back';
+  itemType: 'cover' | 'single' | 'credit' | 'cover-back';
   originalItem: AlbumItemConfig;
   isLeft: boolean;
   pageNumber: number; // 1-based display number for interior pages
   density: 'hard' | 'soft';
   label: string;
   previewSrc?: string;
-  fallbackSrc?: string;
 }
 
+// ponytail: compile only elements that physically show on the website
 export function compileAlbumLeaves(config: AlbumConfig): CompiledLeaf[] {
   const leaves: CompiledLeaf[] = [];
   let pageCounter = 1;
@@ -29,8 +28,7 @@ export function compileAlbumLeaves(config: AlbumConfig): CompiledLeaf[] {
     pageNumber: 0,
     density: 'hard',
     label: 'Front Cover',
-    previewSrc: frontCoverItem?.src || assets.frontCover,
-    fallbackSrc: frontCoverItem?.fallbackSrc,
+    previewSrc: frontCoverItem?.src || '',
   });
 
   // 2. Interior Items
@@ -40,134 +38,43 @@ export function compileAlbumLeaves(config: AlbumConfig): CompiledLeaf[] {
   const closingCreditItem = creditItems[1];
   const backCoverItem = config.items.find(i => i.type === 'cover-back');
 
-  // If first interior item is a single page (e.g. page-00), let's create opening flyleaf on left, and page-00 on right!
-  // In luxury flush mount albums, opening the cover reveals an endpaper/flyleaf on the left, and opening title page on the right.
   let isNextLeft = true;
 
-  // Let's check first interior item
-  const firstItem = interiorItems[0];
-  if (firstItem && firstItem.type === 'single') {
-    // Left leaf: Opening details page (TPH logo)
+  // If opening credit exists, place it on left, page 1 on right
+  if (openingCreditItem) {
     leaves.push({
       id: 'leaf-credit-opening',
       leafIndex: leaves.length,
       itemType: 'credit',
-      originalItem: openingCreditItem as AlbumItemConfig,
+      originalItem: openingCreditItem,
       isLeft: true,
       pageNumber: 0,
       density: 'soft',
       label: 'Photographer Credits',
-      previewSrc: assets.frontCover,
+      previewSrc: openingCreditItem?.creditInfo?.logoSrc || '',
     });
     isNextLeft = false;
+  }
 
-    // Right leaf: Opening page
+  // Interior Single Pages
+  for (const item of interiorItems) {
+    const num = pageCounter++;
     leaves.push({
-      id: `leaf-${firstItem.id}`,
+      id: `leaf-${item.id}`,
       leafIndex: leaves.length,
       itemType: 'single',
-      originalItem: firstItem,
-      isLeft: false,
-      pageNumber: pageCounter++,
+      originalItem: item,
+      isLeft: isNextLeft,
+      pageNumber: num,
       density: 'soft',
-      label: firstItem.title || 'Page 01',
-      previewSrc: firstItem.src,
-      fallbackSrc: firstItem.fallbackSrc,
+      label: item.title || `Page ${String(num).padStart(2, '0')}`,
+      previewSrc: item.src,
     });
-    isNextLeft = true;
+    isNextLeft = !isNextLeft;
   }
 
-  // Process remaining interior items (starting from index 1 if first was single, or 0)
-  const remainingInterior = (firstItem && firstItem.type === 'single') ? interiorItems.slice(1) : interiorItems;
-
-  for (const item of remainingInterior) {
-    if (item.type === 'spread') {
-      // If we are currently expecting a right page, insert a filler or flyleaf to align the spread to left-right
-      if (!isNextLeft) {
-        leaves.push({
-          id: `leaf-flyleaf-${leaves.length}`,
-          leafIndex: leaves.length,
-          itemType: 'flyleaf',
-          originalItem: {
-            id: `flyleaf-${leaves.length}`,
-            type: 'single',
-            title: config.coupleNames,
-          },
-          isLeft: false,
-          pageNumber: pageCounter++,
-          density: 'soft',
-          label: 'Interlude',
-        });
-        isNextLeft = true;
-      }
-
-      // Continuous 3:1 Spread: Left Leaf
-      leaves.push({
-        id: `leaf-${item.id}-left`,
-        leafIndex: leaves.length,
-        itemType: 'spread-left',
-        originalItem: item,
-        isLeft: true,
-        pageNumber: pageCounter++,
-        density: 'soft',
-        label: `${item.title || 'Panoramic Spread'} (Left)`,
-        previewSrc: item.src,
-        fallbackSrc: item.fallbackSrc,
-      });
-
-      // Continuous 3:1 Spread: Right Leaf
-      leaves.push({
-        id: `leaf-${item.id}-right`,
-        leafIndex: leaves.length,
-        itemType: 'spread-right',
-        originalItem: item,
-        isLeft: false,
-        pageNumber: pageCounter++,
-        density: 'soft',
-        label: `${item.title || 'Panoramic Spread'} (Right)`,
-        previewSrc: item.src,
-        fallbackSrc: item.fallbackSrc,
-      });
-
-      isNextLeft = true;
-    } else if (item.type === 'single') {
-      const num = pageCounter++;
-      leaves.push({
-        id: `leaf-${item.id}`,
-        leafIndex: leaves.length,
-        itemType: 'single',
-        originalItem: item,
-        isLeft: isNextLeft,
-        pageNumber: num,
-        density: 'soft',
-        label: item.title || `Page ${String(num).padStart(2, '0')}`,
-        previewSrc: item.src,
-        fallbackSrc: item.fallbackSrc,
-      });
-      isNextLeft = !isNextLeft;
-    }
-  }
-
-  // 3. Closing details page (Mindtrix Media logo) — right side, immediately before back cover
+  // 3. Closing Credit Page (before back cover)
   if (closingCreditItem) {
-    // Credit must land on an EVEN index (= right side). Odd index = left side.
-    if (leaves.length % 2 === 1) {
-      // Next slot is left side — insert filler flyleaf first so credit lands on the right
-      leaves.push({
-        id: `leaf-flyleaf-${leaves.length}`,
-        leafIndex: leaves.length,
-        itemType: 'flyleaf',
-        originalItem: {
-          id: `flyleaf-${leaves.length}`,
-          type: 'single',
-          title: config.coupleNames,
-        },
-        isLeft: true,
-        pageNumber: 0,
-        density: 'soft',
-        label: 'Interlude',
-      });
-    }
     leaves.push({
       id: 'leaf-credit-closing',
       leafIndex: leaves.length,
@@ -179,51 +86,9 @@ export function compileAlbumLeaves(config: AlbumConfig): CompiledLeaf[] {
       label: closingCreditItem.creditInfo?.studioName || 'Details',
       previewSrc: closingCreditItem.creditInfo?.logoSrc,
     });
-  } else if (openingCreditItem) {
-    leaves.push({
-      id: 'leaf-flyleaf-opening', // ponytail: swapped
-      leafIndex: leaves.length,
-      itemType: 'flyleaf',
-      originalItem: {
-        id: 'flyleaf-opening',
-        type: 'single',
-        title: config.coupleNames,
-        subtitle: 'Fin',
-        caption: 'Handcrafted Luxury Album',
-      },
-      isLeft: isNextLeft,
-      pageNumber: 0,
-      density: 'soft',
-      label: 'Endpaper',
-    });
-    isNextLeft = !isNextLeft;
   }
 
-  // Ensure total leaves before the back cover ends on an even number so back cover is on the left
-  // (Total book leaves must be EVEN: 0 to N-1)
-  // If leaves.length is currently odd (e.g. 9), adding back cover makes 10 (even). That is correct!
-  // If leaves.length is even (e.g. 8), adding back cover would make 9 (odd, back cover would appear on right side).
-  // In that case, insert an elegant final flyleaf/endpaper on the left!
-  if (leaves.length % 2 === 0) {
-    leaves.push({
-      id: 'leaf-flyleaf-closing',
-      leafIndex: leaves.length,
-      itemType: 'flyleaf',
-      originalItem: {
-        id: 'flyleaf-closing',
-        type: 'single',
-        title: config.coupleNames,
-        subtitle: 'Fin',
-        caption: 'Handcrafted Luxury Album',
-      },
-      isLeft: isNextLeft,
-      pageNumber: 0,
-      density: 'soft',
-      label: 'Closing Endpaper',
-    });
-  }
-
-  // 4. Back Cover (Leaf N - 1)
+  // 4. Back Cover (Final Leaf)
   const finalBackCoverItem = backCoverItem || config.items[config.items.length - 1];
   leaves.push({
     id: 'leaf-back-cover',
@@ -234,8 +99,7 @@ export function compileAlbumLeaves(config: AlbumConfig): CompiledLeaf[] {
     pageNumber: 0,
     density: 'hard',
     label: 'Back Cover',
-    previewSrc: finalBackCoverItem?.src || assets.backCover,
-    fallbackSrc: finalBackCoverItem?.fallbackSrc,
+    previewSrc: finalBackCoverItem?.src || '',
   });
 
   return leaves;

@@ -150,24 +150,8 @@ export const ThumbnailStrip: React.FC<ThumbnailStripProps> = ({
                   >
                     {/* Image Area in 3:2 Ratio strictly */}
                     <div className="w-full aspect-[3/2] bg-neutral-900 overflow-hidden relative">
-                      {/* 1. Details Page (Flyleaf / Opening Details) */}
-                      {item.itemType === 'flyleaf' ? (
-                        <div className="w-full h-full bg-[#101114] text-[#ede8de] flex flex-col items-center justify-center p-2 relative select-none">
-                          <div className="absolute inset-1 sm:inset-1.5 border border-[#c5a059]/25 pointer-events-none" />
-                          <img
-                            src={tphLogo}
-                            alt="TPH Logo"
-                            className="w-5 h-5 sm:w-6 sm:h-6 object-contain mb-1 shrink-0"
-                          />
-                          <span className="text-[7.5px] sm:text-[9px] font-sans-brand gold-foil-text font-bold tracking-[0.14em] uppercase text-center px-1 truncate max-w-full">
-                            {config.coupleNames}
-                          </span>
-                          <span className="text-[6.5px] sm:text-[7.5px] font-sans text-[#dfba73]/85 tracking-wider mt-0.5 uppercase">
-                            {item.originalItem?.subtitle || 'Anniversary Edition'}
-                          </span>
-                        </div>
-                      ) : item.itemType === 'credit' ? (
-                        /* 2. Details Page (Photographer / Studio / Production Credit matching main pages) */
+                      {item.itemType === 'credit' ? (
+                        /* Details Page (Photographer / Studio / Production Credit matching main pages) */
                         (() => {
                           const credit = item.originalItem?.creditInfo || config.photographer;
                           const isWideLogo = credit.studioName === 'Mindtrix Media';
@@ -195,58 +179,16 @@ export const ThumbnailStrip: React.FC<ThumbnailStripProps> = ({
                             </div>
                           );
                         })()
-                      ) : item.itemType === 'spread-left' ? (
-                        /* 3. Continuous Spread Left Half (Page Image) */
-                        <div className="w-full h-full relative overflow-hidden bg-neutral-900">
-                          <img
-                            src={item.previewSrc}
-                            onError={(e) => {
-                              if (item.fallbackSrc && e.currentTarget.src !== window.location.origin + item.fallbackSrc) {
-                                e.currentTarget.src = item.fallbackSrc;
-                              }
-                            }}
-                            alt={`Page ${item.pageNumber}`}
-                            className="absolute top-0 bottom-0 max-w-none h-full object-cover select-none pointer-events-none group-hover:scale-105 transition-transform duration-500"
-                            style={{
-                              width: '200%',
-                              left: '0%',
-                            }}
-                            decoding="async"
-                          />
-                        </div>
-                      ) : item.itemType === 'spread-right' ? (
-                        /* 4. Continuous Spread Right Half (Page Image) */
-                        <div className="w-full h-full relative overflow-hidden bg-neutral-900">
-                          <img
-                            src={item.previewSrc}
-                            onError={(e) => {
-                              if (item.fallbackSrc && e.currentTarget.src !== window.location.origin + item.fallbackSrc) {
-                                e.currentTarget.src = item.fallbackSrc;
-                              }
-                            }}
-                            alt={`Page ${item.pageNumber}`}
-                            className="absolute top-0 bottom-0 max-w-none h-full object-cover select-none pointer-events-none group-hover:scale-105 transition-transform duration-500"
-                            style={{
-                              width: '200%',
-                              left: '-100%',
-                            }}
-                            decoding="async"
-                          />
-                        </div>
                       ) : (
-                        /* 5. Single Page or Front/Back Cover */
+                        /* Single Page or Front/Back Cover */
                         <div className="w-full h-full relative overflow-hidden bg-neutral-900">
                           {item.previewSrc ? (
                             <img
                               src={item.previewSrc}
-                              onError={(e) => {
-                                if (item.fallbackSrc && e.currentTarget.src !== window.location.origin + item.fallbackSrc) {
-                                  e.currentTarget.src = item.fallbackSrc;
-                                }
-                              }}
                               alt={displayName}
                               className="w-full h-full object-cover select-none pointer-events-none group-hover:scale-105 transition-transform duration-500"
                               style={{ aspectRatio: '3 / 2' }}
+                              loading="lazy"
                               decoding="async"
                             />
                           ) : (

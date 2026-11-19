@@ -48,8 +48,6 @@ interface AlbumControlsProps {
   setIsHovered: (v: boolean) => void;
   showSettings: boolean;
   setShowSettings: (v: boolean) => void;
-  showAbout: boolean;
-  setShowAbout: (v: boolean) => void;
   renewalDue?: boolean;
   onRenewalExpire?: () => void;
 }
@@ -85,8 +83,6 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
   setIsHovered,
   showSettings,
   setShowSettings,
-  showAbout,
-  setShowAbout,
   renewalDue = false,
   onRenewalExpire,
 }) => {
@@ -120,31 +116,6 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
           <RenewalCountdown onExpire={onRenewalExpire} className="pointer-events-auto" />
         )}
       </header>
-
-      {/* Floating Side Navigation Chevrons: Commented out per user request */}
-      {/* 
-      <button
-        onClick={onPrev}
-        disabled={isCover}
-        aria-label="Previous Page"
-        className={`fixed ${isShortLandscape ? 'left-2 p-2' : 'left-4 sm:left-8 p-2.5 sm:p-3.5'} top-1/2 -translate-y-1/2 z-40 rounded-full bg-white/90 hover:bg-white text-neutral-800 hover:text-black border border-neutral-200/80 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-md transition-all duration-500 disabled:opacity-0 disabled:pointer-events-none hover:scale-105 active:scale-95 ${
-          isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-3 pointer-events-none'
-        }`}
-      >
-        <ChevronLeft className={`${isShortLandscape ? 'w-4 h-4' : 'w-5 h-5 sm:w-5.5 sm:h-5.5'}`} />
-      </button>
-
-      <button
-        onClick={onNext}
-        disabled={isBackCover}
-        aria-label="Next Page"
-        className={`fixed ${isShortLandscape ? 'right-2 p-2' : 'right-4 sm:right-8 p-2.5 sm:p-3.5'} top-1/2 -translate-y-1/2 z-40 rounded-full bg-white/90 hover:bg-white text-neutral-800 hover:text-black border border-neutral-200/80 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-md transition-all duration-500 disabled:opacity-0 disabled:pointer-events-none hover:scale-105 active:scale-95 ${
-          isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-3 pointer-events-none'
-        }`}
-      >
-        <ChevronRight className={`${isShortLandscape ? 'w-4 h-4' : 'w-5 h-5 sm:w-5.5 sm:h-5.5'}`} />
-      </button>
-      */}
 
       {/* Bottom Detection Zone: Wakes up controls when cursor approaches bottom */}
       <div
@@ -224,28 +195,6 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
                 ))}
               </div>
             </div>
-
-            {/* Physical Album Format: Commented out per user request */}
-            {/* 
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-neutral-600 font-sans text-xs">Dimensions</span>
-              <div className="flex items-center gap-1 bg-neutral-100 p-0.5 rounded-lg border border-neutral-200/50">
-                {(['standard', 'extended', 'large'] as const).map((sz) => (
-                  <button
-                    key={sz}
-                    onClick={() => onChangeSize(sz)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] capitalize transition-all font-sans font-medium ${
-                      selectedSize === sz
-                        ? 'bg-neutral-900 text-white shadow-xs'
-                        : 'text-neutral-600 hover:text-neutral-900'
-                    }`}
-                  >
-                    {sz === 'standard' ? '12×18"' : sz === 'extended' ? '13×20"' : '14×20"'}
-                  </button>
-                ))}
-              </div>
-            </div>
-            */}
 
             <div className="pt-2 border-t border-neutral-100 flex justify-between items-center text-[10px] text-neutral-400 font-sans">
               <span>Fine Art Flush Mount Silk Edition</span>
@@ -389,69 +338,6 @@ export const AlbumControls: React.FC<AlbumControlsProps> = ({
           </button>
         </nav>
       </div>
-
-      {/* About & Chronicle Story Modal */}
-      {showAbout && (
-        <div className="fixed inset-0 z-50 bg-neutral-950/30 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-[#faf9f6] border border-neutral-200 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative text-neutral-900 animate-in zoom-in-95 duration-200">
-            <button
-              onClick={() => setShowAbout(false)}
-              className="absolute top-5 right-5 p-2 rounded-full text-neutral-400 hover:text-neutral-900 hover:bg-neutral-200/50 transition-colors"
-              aria-label="Close About"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="flex flex-col gap-5">
-              <div>
-                <span className="text-[11px] font-sans font-semibold uppercase tracking-[0.2em] text-neutral-400">
-                  Anniversary Heirloom Edition
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-bold font-sans-brand tracking-tight text-neutral-950 mt-1">
-                  Subhash &amp; Rita Banerjee
-                </h2>
-                <p className="text-sm font-sans text-neutral-600 mt-1">
-                  Anniversary Digital Album
-                </p>
-              </div>
-
-              <div className="h-px bg-neutral-200" />
-
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div>
-                  <span className="text-neutral-400 uppercase tracking-wider text-[10px] block">Date</span>
-                  <span className="font-medium text-neutral-800">—</span>
-                </div>
-                <div>
-                  <span className="text-neutral-400 uppercase tracking-wider text-[10px] block">Location</span>
-                  <span className="font-medium text-neutral-800">—</span>
-                </div>
-                <div>
-                  <span className="text-neutral-400 uppercase tracking-wider text-[10px] block">Photography</span>
-                  <span className="font-medium text-neutral-800">Royal Vows Fine Art Studios</span>
-                </div>
-                <div>
-                  <span className="text-neutral-400 uppercase tracking-wider text-[10px] block">Print Medium</span>
-                  <span className="font-medium text-neutral-800">250gsm Archival Silk</span>
-                </div>
-              </div>
-
-              <div className="p-4 bg-white rounded-2xl border border-neutral-200/70 text-xs text-neutral-600 leading-relaxed">
-                An heirloom-grade digital keepsake reproducing hand-bound flush mount spreads with 180° panoramic continuity, physical page turning acoustics, and tactile gold foil detailing.
-              </div>
-
-              <div className="flex justify-end pt-2">
-                <button
-                  onClick={() => setShowAbout(false)}
-                  className="px-5 py-2 bg-neutral-900 text-white text-xs font-medium rounded-full hover:bg-neutral-800 transition active:scale-95"
-                >
-                  Return to Chronicle
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };

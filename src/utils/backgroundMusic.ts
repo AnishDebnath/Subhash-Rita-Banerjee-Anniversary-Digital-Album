@@ -1,4 +1,4 @@
-import { assets } from '@/assets';
+import backgroundMusicAudio from '@/assets/background-music.mp3';
 
 class BackgroundMusicManager {
   private audio: HTMLAudioElement | null = null;
@@ -8,7 +8,7 @@ class BackgroundMusicManager {
 
   private init() {
     if (this.audio) return;
-    this.audio = new Audio(assets.backgroundMusic);
+    this.audio = new Audio(backgroundMusicAudio);
     this.audio.loop = true;
     this.audio.preload = 'auto';
     this.audio.volume = this.isMuted ? 0 : this.volume;

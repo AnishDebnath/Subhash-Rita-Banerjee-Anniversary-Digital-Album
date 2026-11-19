@@ -8,13 +8,42 @@
  * - Physical album dimensions (Standard 18x12" closed / 36x12" open, Extended, Large)
  * - Slideshow autoplay settings
  * - Synthesized tactile audio settings
- * 
- * Any image or detail can be updated here without modifying the page-turning engine.
  */
 
-import { assets } from '@/assets';
 import tphLogo from '@/assets/tph.png';
 import mindtrixLogo from '@/assets/watermark.png';
+
+// 1. ImageKit cloud endpoint loaded strictly from .env
+const IMAGEKIT_URL_ENDPOINT = (
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_IMAGEKIT_URL_ENDPOINT) || ''
+).trim().replace(/\/+$/, '');
+
+// 2. Direct ImageKit URL builder (strictly requires VITE_IMAGEKIT_URL_ENDPOINT in .env)
+export const getImageKitUrl = (path: string): string => {
+  if (!IMAGEKIT_URL_ENDPOINT) return '';
+  const cleanPath = path.replace(/^\/+/, '');
+  return `${IMAGEKIT_URL_ENDPOINT}/${cleanPath}`;
+};
+
+// 3. Folder structure matching your ImageKit media library:
+// Root: <Project-Folder>/<Album-Folder>/<filename>.jpg
+const ROOT_FOLDER = 'Subhash-Rita-Banerjee-Anniversary-Digital-Album';
+
+// Front Cover & Back Cover
+export const coverImage = getImageKitUrl(`${ROOT_FOLDER}/front-cover.jpg`);
+export const backCoverImage = getImageKitUrl(`${ROOT_FOLDER}/back-cover.jpg`);
+
+// Interior Pages
+export const TOTAL_PAGES = 24;
+export const interiorPages: string[] = [];
+
+for (let i = 1; i <= TOTAL_PAGES; i++) {
+  interiorPages.push(
+    getImageKitUrl(
+      `${ROOT_FOLDER}/page-${String(i).padStart(2, '0')}.jpg`
+    )
+  );
+}
 
 export interface AlbumDimensions {
   closedWidthInches: number;
@@ -37,27 +66,19 @@ export interface PhotographerCreditInfo {
   showAlbumMeta?: boolean; // when false, album date/location lines are hidden
 }
 
-export type AlbumPageType = 'cover' | 'single' | 'spread' | 'credit' | 'cover-back';
+export type AlbumPageType = 'cover' | 'single' | 'credit' | 'cover-back';
 
 export interface AlbumItemConfig {
   id: string;
   type: AlbumPageType;
   src?: string;
-  fallbackSrc?: string;
   title?: string;
-  subtitle?: string;
-  caption?: string;
-  // For continuous panoramic spreads
-  layout?: 'two-page-continuous' | 'single-page';
-  aspectRatio?: string; // "3:1"
-  splitAt?: number;      // 0.5 for center fold
-  preserveOriginalImage?: boolean;
-  // For photographer credit page
   creditInfo?: PhotographerCreditInfo;
   isLeft?: boolean;
 }
 
 export interface AlbumConfig {
+  id?: string;
   title: string;
   coupleNames: string;
   weddingDate: string;
@@ -82,6 +103,7 @@ export interface AlbumConfig {
 }
 
 export const albumConfig: AlbumConfig = {
+  id: 'wedding-album',
   title: 'Subhash & Rita Banerjee Anniversary',
   coupleNames: 'Subhash & Rita Banerjee',
   weddingDate: '19 February 2026',
@@ -126,56 +148,39 @@ export const albumConfig: AlbumConfig = {
     defaultVolume: 0.4,
   },
   photographer: {
-    photographerName: 'Vikramaditya Rathore',
-    studioName: 'Royal Vows Fine Art Studios',
-    role: 'Principal Destination Wedding Photographer',
-    websiteUrl: 'https://royalvows.studio',
-    socialHandle: '@royalvows.fineart',
-    location: 'Udaipur · Mumbai · London',
-    quote: 'Every glance, every tear, every blessing preserved in timeless print.',
+    photographerName: '',
+    studioName: 'The Photographer House',
+    role: 'Principal Photographer',
+    websiteUrl: 'https://www.thephotographerhouse.com',
+    quote: 'Where Every Click Tells a Story',
     logoSrc: tphLogo,
   },
   items: [
-    // Front cover
+    // 1. Front Cover (Leaf 0)
     {
       id: 'cover-front',
       type: 'cover',
-      src: assets.frontCover,
+      src: coverImage,
       title: 'Subhash & Rita Banerjee',
     },
-    // Interior pages: page-01 shows first on the right after opening the cover
-    { id: 'page-01', type: 'single', src: assets.page01 },
-    { id: 'page-02', type: 'single', src: assets.page02 },
-    { id: 'page-03', type: 'single', src: assets.page03 },
-    { id: 'page-04', type: 'single', src: assets.page04 },
-    { id: 'page-05', type: 'single', src: assets.page05 },
-    { id: 'page-06', type: 'single', src: assets.page06 },
-    { id: 'page-07', type: 'single', src: assets.page07 },
-    { id: 'page-08', type: 'single', src: assets.page08 },
-    { id: 'page-09', type: 'single', src: assets.page09 },
-    { id: 'page-10', type: 'single', src: assets.page10 },
-    { id: 'page-11', type: 'single', src: assets.page11 },
-    { id: 'page-12', type: 'single', src: assets.page12 },
-    { id: 'page-13', type: 'single', src: assets.page13 },
-    { id: 'page-14', type: 'single', src: assets.page14 },
-    { id: 'page-15', type: 'single', src: assets.page15 },
-    { id: 'page-16', type: 'single', src: assets.page16 },
-    { id: 'page-17', type: 'single', src: assets.page17 },
-    { id: 'page-18', type: 'single', src: assets.page18 },
-    { id: 'page-19', type: 'single', src: assets.page19 },
-    { id: 'page-20', type: 'single', src: assets.page20 },
-    { id: 'page-21', type: 'single', src: assets.page21 },
-    { id: 'page-22', type: 'single', src: assets.page22 },
-    { id: 'page-23', type: 'single', src: assets.page23 },
-    { id: 'page-24', type: 'single', src: assets.page24 },
-    // Back cover
+
+    // 2. Interior Pages (1..N)
+    ...interiorPages.map((pageSrc, idx) => ({
+      id: `page-${String(idx + 1).padStart(2, '0')}`,
+      type: 'single' as const,
+      src: pageSrc,
+      title: `Page ${String(idx + 1).padStart(2, '0')}`,
+    })),
+
+    // 3. Back Cover (Final Leaf)
     {
       id: 'cover-back',
       type: 'cover-back',
-      src: assets.backCover,
+      src: backCoverImage,
       title: 'Subhash & Rita Banerjee',
     },
-    // Credit / details page (first left side — TPH logo)
+
+    // 4. Details Pages (TPH & Mindtrix Media)
     {
       id: 'credit-tph',
       type: 'credit',
@@ -189,7 +194,6 @@ export const albumConfig: AlbumConfig = {
         logoSrc: tphLogo,
       },
     },
-    // Credit / details page (last right side — Mindtrix Media logo)
     {
       id: 'credit-mindtrix',
       type: 'credit',

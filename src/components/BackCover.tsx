@@ -1,6 +1,5 @@
 import React from 'react';
 import { AlbumConfig } from '@/data/album.config';
-import { assets } from '@/assets';
 
 interface BackCoverProps {
   config: AlbumConfig;
@@ -9,7 +8,7 @@ interface BackCoverProps {
 
 export const BackCover: React.FC<BackCoverProps> = ({ config }) => {
   const backItem = config.items.find(i => i.type === 'cover-back');
-  const coverImage = backItem?.src || backItem?.fallbackSrc || assets.backCover;
+  const backCoverImage = backItem?.src || '';
 
   return (
     <div 
@@ -32,16 +31,12 @@ export const BackCover: React.FC<BackCoverProps> = ({ config }) => {
       {/* Layer 2 — Back Hardcover Board (Upper Part) */}
       <div className="absolute left-2 sm:left-2.5 right-0 top-0 bottom-2.5 sm:bottom-3 z-20 overflow-hidden rounded-tl-xs rounded-bl-sm shadow-[-2px_4px_10px_rgba(0,0,0,0.4)]">
         {/* Full-Bleed Centered Image */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
           <img 
-            src={coverImage}
-            onError={(e) => {
-              if (backItem?.fallbackSrc && e.currentTarget.src !== window.location.origin + backItem.fallbackSrc) {
-                e.currentTarget.src = backItem.fallbackSrc;
-              }
-            }}
-            alt="Back cover — Subhash & Rita Banerjee Anniversary Digital Album"
+            src={backCoverImage}
+            alt="Back Cover"
             className="w-full h-full object-cover object-center"
+            loading="eager"
             decoding="async"
           />
         </div>
